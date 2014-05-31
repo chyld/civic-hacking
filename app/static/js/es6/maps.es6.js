@@ -21,7 +21,7 @@
     directionsService = new google.maps.DirectionsService();
     directionsDisplay = new google.maps.DirectionsRenderer();
     directionsDisplay.setMap(map);
-    directionsDisplay.setPanel(document.getElementById('directions'));
+    directionsDisplay.setPanel(document.getElementById('directions'));    
   }
 })();
 
