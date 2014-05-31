@@ -9,6 +9,14 @@
   function init(){
     initMap(36, -86, 8);
     $('#geolocate').click(geolocate);
+    $('#map').css({
+      'height': winHeight,
+    });
+    $(window).resize(function(){
+      $('#map').css({
+        'height': winHeight,
+      });
+    });
   }
 
   function initMap(lat, lng, zoom){
@@ -24,6 +32,7 @@
 
 /* GLOBAL MAP VARIABLES */
 
+var winHeight = $(window).height();
 var map;
 var loc = {};
 var markers = [];

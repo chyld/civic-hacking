@@ -5,15 +5,34 @@ html
     title= title
     link(href='/css/normalize.css', rel='stylesheet')
     link(href='/css/buttons.css', rel='stylesheet')
+    link(href='/css/ratchet.min.css', rel='stylesheet')
+    link(href='/css/jquery.mmenu.css', rel='stylesheet')
+    link(href='/css/jquery.mmenu.widescreen.css', rel='stylesheet', media='all and (min-width: 900px)')
     link(href='/less/app.css', rel='stylesheet')
   body
-    block content
+
+    #header
+      nav#my-menu
+        ul#mm-m0-p0
+          li#open-icon-menu
+            a(href='#')
+              i.icon.icon-white.icon-th-list
+          li
+            span one
+          li
+            span two
+          li
+            span three
+    #wrapper
+      block content
 
     script(src='/js/vendor/jquery-2.1.1.js')
     script(src='/js/vendor/lodash-2.4.1.js')
     script(src='/js/vendor/moment-2.6.0.js')
     script(src='/js/vendor/buttons.js')
     script(src='/js/vendor/traceur.js')
+    script(src='/js/vendor/ratchet.min.js')
+    script(src='/js/vendor/jquery.mmenu.js')
     script(src='https://maps.googleapis.com/maps/api/js?key=AIzaSyD4sNttD_i7PtUfNbANpfyCNt2FRMWzkHY&sensor=true')
     script(src='/js/es6/compiled/main.js')
     script(src='/js/es6/compiled/maps.js')
@@ -23,5 +42,9 @@ html
     script(src='/js/es6/compiled/art.js')
     script(src='/js/es6/compiled/wifi.js')
     script(src='/js/es6/compiled/history.js')
+    script.
+      $(function() {
+        $('#my-menu').mmenu();
+      });
 
     block scripts
