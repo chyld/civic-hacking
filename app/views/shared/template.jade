@@ -2,37 +2,51 @@ doctype html
 html
   head
     meta(charset='utf-8')
+    meta(name='viewport' content='width=device-width, initial-scale=1')
     title= title
     link(href='/css/normalize.css', rel='stylesheet')
     link(href='/css/buttons.css', rel='stylesheet')
-    link(href='/css/ratchet.min.css', rel='stylesheet')
-    link(href='/css/jquery.mmenu.css', rel='stylesheet')
+    link(rel='stylesheet', type='text/css', href='css/default.css')
+    link(rel='stylesheet', type='text/css', href='css/component.css')
+    link(rel='stylesheet' href='//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css')
+    link(rel='stylesheet' href='http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css')
     link(href='/css/jquery.mmenu.widescreen.css', rel='stylesheet', media='all and (min-width: 900px)')
     link(href='/less/app.css', rel='stylesheet')
-  body
-
-    #header
-      nav#my-menu
-        ul#mm-m0-p0
-          li#open-icon-menu
-            a(href='#')
-              i.icon.icon-white.icon-th-list
-          li
-            span one
-          li
-            span two
-          li
-            span three
-    #wrapper
-      block content
+  body.cbp-spmenu-push
+    nav.cbp-spmenu.cbp-spmenu-vertical.cbp-spmenu-left#cbp-spmenu-s1
+      h3 Menu
+      select
+        option Activity Type
+        option Arts
+        option Bar
+        option Bus Stop
+        option Food Trucks
+        option Historic
+        option Parks
+        option Wifi
+      select
+        option Distance
+        option 1 Mile
+        option 3 Miles
+        option 5 Miles
+        option 10 Miles
+        option 15 Miles
+      button GO!
+    .container
+      header.clearfix
+        span iTNerary
+    .main
+      section
+        button#showLeftPush Start Planning
+    block content
 
     script(src='/js/vendor/jquery-2.1.1.js')
     script(src='/js/vendor/lodash-2.4.1.js')
     script(src='/js/vendor/moment-2.6.0.js')
     script(src='/js/vendor/buttons.js')
     script(src='/js/vendor/traceur.js')
-    script(src='/js/vendor/ratchet.min.js')
-    script(src='/js/vendor/jquery.mmenu.js')
+    script(src='/js/vendor/modernizr.custom.js')
+    script(src='/js/vendor/classie.js')
     script(src='https://maps.googleapis.com/maps/api/js?key=AIzaSyD4sNttD_i7PtUfNbANpfyCNt2FRMWzkHY&sensor=true')
     script(src='/js/es6/compiled/main.js')
     script(src='/js/es6/compiled/maps.js')
@@ -43,8 +57,21 @@ html
     script(src='/js/es6/compiled/wifi.js')
     script(src='/js/es6/compiled/history.js')
     script.
-      $(function() {
-        $('#my-menu').mmenu();
-      });
+      var menuLeft = document.getElementById( 'cbp-spmenu-s1' ),
+        showLeftPush = document.getElementById( 'showLeftPush' ),
+        body = document.body;
+
+      showLeftPush.onclick = function() {
+        classie.toggle( this, 'active' );
+        classie.toggle( body, 'cbp-spmenu-push-toright' );
+        classie.toggle( menuLeft, 'cbp-spmenu-open' );
+        disableOther( 'showLeftPush' );
+      };
+
+      function disableOther( button ) {
+        if( button !== 'showLeftPush' ) {
+          classie.toggle( showLeftPush, 'disabled' );
+        }
+      }
 
     block scripts
