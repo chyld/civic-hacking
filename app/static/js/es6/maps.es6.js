@@ -93,9 +93,11 @@ function getDirections(pos){
 function clearMarkers() {
   'use strict';
   for (var i = 0; i < markers.length; i++ ) {
-    markers[i].setMap(null);
+    if(markers[i].title !== 'Me') {
+      markers[i].setMap(null);
+    }
   }
-  markers.length = 0;
+  markers.length = 1;
 }
 
 function getDistance(lat1, lon1, lat2, lon2) {
