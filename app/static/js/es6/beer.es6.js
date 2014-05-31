@@ -16,7 +16,7 @@
   }
 
   function plotOnMap(data){
-    addMarker(data.mapped_location.latitude, data.mapped_location.longitude, data.business_name);
+    window.addMarker(data.mapped_location.latitude, data.mapped_location.longitude, data.business_name);
   }
 
 })();
