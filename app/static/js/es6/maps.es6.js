@@ -54,7 +54,7 @@ function geolocate(){
       loc.lng = p.coords.longitude;
       centerMap(p.coords.latitude, p.coords.longitude);
       map.setZoom(14);
-      addMarker(p.coords.latitude, p.coords.longitude, 'Me', '/img/geolocate.png');
+      addMarker(null, p.coords.latitude, p.coords.longitude, 'Me', '/img/geolocate.png');
     },
     e=>console.log(e),
     options);
@@ -69,7 +69,7 @@ function centerMap(lat, lng){
 function clickMarker(){
   'use strict';
   var pos = {};
-  pos.title = this.position.title || 'Empty';
+  pos.title = this.title || 'Anonymous';
   pos.lat = this.position.lat();
   pos.lng = this.position.lng();
   addWayPoint(pos);
@@ -93,8 +93,8 @@ function printInfo(value, key){
 
 function addWayPoint(pos){
   'use strict';
-  pos = new google.maps.LatLng(pos.lat, pos.lng);
-  waypoints.push({location:pos, stopover:true});
+  var latLng = new google.maps.LatLng(pos.lat, pos.lng);
+  waypoints.push({location:latLng, stopover:true});
   $('#waypoints').append(`<button class=waypoint>${pos.title}</button>`);
 }
 
