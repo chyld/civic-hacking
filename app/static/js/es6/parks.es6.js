@@ -7,6 +7,10 @@
   $(document).ready(init);
 
   function init(){
+    $('#get-parks').on('click', getParksData);
+  }
+
+  function getParksData() {
     var url = 'http://data.nashville.gov/resource/74d7-b74t.json?';
     $.getJSON(url, addParksDataToMap);
   }
