@@ -1,4 +1,3 @@
-/* global google, map */
 /* jshint unused:false */
 /* jshint camelcase:false */
 
@@ -14,8 +13,7 @@
 
   function addParksDataToMap(data) {
     $.each(data, function(i, entry) {
-      console.log(entry);
-      addMarker(entry.mapped_location.latitude, entry.mapped_location.longitude, entry.mapped_location.park_name);
+      window.addMarker(entry.mapped_location.latitude, entry.mapped_location.longitude, entry.mapped_location.park_name);
     });
   }
 })();
