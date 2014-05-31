@@ -1,5 +1,6 @@
 /* global google, _ */
 /* jshint unused:false, latedef:false */
+/* jshint camelcase:false */
 
 (function(){
   'use strict';
@@ -9,6 +10,7 @@
   function init(){
     initMap(36.1, -86.7, 11);
     $('#geolocate').click(geolocate);
+    $('#submit').click(getActivities);
     $('#clear-markers').click(clearMarkers);
     $('#trip').click(trip);
   }
@@ -111,9 +113,11 @@ function trip(){
 function clearMarkers() {
   'use strict';
   for (var i = 0; i < markers.length; i++ ) {
-    markers[i].setMap(null);
+    if(markers[i].title !== 'Me') {
+      markers[i].setMap(null);
+    }
   }
-  markers.length = 0;
+  markers.length = 1;
 }
 
 function getDistance(lat1, lon1, lat2, lon2) {
@@ -135,3 +139,82 @@ function deg2rad(deg) {
   'use strict';
   return deg * (Math.PI/180);
 }
+
+function getActivities() {
+  'use strict';
+  var activity = $('select[name="activities"]').val();
+  var radius = $('select[name="radius"]').val();
+  callOpenDataForResults(activity, radius);
+}
+
+function callOpenDataForResults(activity, radius) {
+  'use strict';
+  var key;
+  var name;
+  var icon;
+  switch(activity) {
+    case 'parks':
+      key = '74d7-b74t';
+      name = 'park_name';
+      icon = '/img/marker-icons/park.png';
+      break;
+    case 'beer':
+      key = '3wb6-xy3j';
+      name = 'business_name';
+      icon = '/img/marker-icons/bar.png';
+      break;
+    case 'bus-stops':
+      key = 'vfe9-k7vc';
+      name = 'stopname';
+      icon = '/img/marker-icons/bus.png';
+      break;
+    case 'art':
+      key = 'eviu-nxp6';
+      name = 'artwork';
+      icon = '/img/marker-icons/art.png';
+      break;
+    case 'wifi':
+      key = '4ugp-s85t';
+      name = 'site_name';
+      icon = '/img/marker-icons/wifi.png';
+      break;
+    case 'historical-sites':
+      key = 'vk65-u7my';
+      name = 'title';
+      icon = '/img/marker-icons/history.png';
+  }
+
+  var url = 'http://data.nashville.gov/resource/' + key + '.json?';
+  $.getJSON(url, function(data) {
+    findClosestActivities(data, radius, name, icon);
+  });
+}
+
+function findClosestActivities(data, radius, name, icon) {
+  'use strict';
+  var activities;
+  if(window.loc.lat) {
+    activities = [];
+    $.each(data, function(i, entry) {
+      if(entry.mapped_location) {
+        var dist = window.getDistance(window.loc.lat, window.loc.lng, entry.mapped_location.latitude, entry.mapped_location.longitude);
+        if(dist <= parseFloat(radius, 10)) {
+          activities.push(entry);
+        }
+      }
+    });
+  } else {
+    activities = data;
+  }
+  addActivitiesToMap(activities, name, icon);
+}
+
+function addActivitiesToMap(activities, name, icon) {
+  'use strict';
+  $.each(activities, function(i, entry) {
+    if(entry.mapped_location) {
+      window.addMarker(entry.mapped_location.latitude, entry.mapped_location.longitude, entry[name], icon);
+    }
+  });
+}
+

@@ -4,12 +4,20 @@ block content
   h1 Day Planner
 
   button#geolocate Find Me!
-  button#get-parks Show Parks
-  button#get-beer Show Beer
-  button#get-bus-stops Show Bus Stops
-  button#get-art Show Art
-  button#get-wifi Show Public Wifi
-  button#get-history Show History
+  select(name='activities')
+    option(value='parks', selected='selected') Parks
+      option(value='beer') Beer
+      option(value='bus-stops') Bus Stops
+      option(value='art') Art
+      option(value='wifi') Public Wifi
+      option(value='historical-sites') Historical Sites
+  select(name='radius')
+    option(value='.5', selected='selected') 1/2 mile
+      option(value='1') 1 mile
+      option(value='2') 2 miles
+      option(value='5') 5 miles
+      option(value='10') 10 miles
+  button#submit Submit
   button#clear-markers Clear Map
   button#trip Trip
   #waypoints
