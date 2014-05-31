@@ -1,6 +1,5 @@
-/* global google */
-/* jshint unused:false, latedef:false */
-/* jshint camelcase:false */
+/* global google, _ */
+/* jshint unused:false, latedef:false, camelcase:false */
 
 (function(){
   'use strict';
@@ -12,6 +11,7 @@
     $('#geolocate').click(geolocate);
     $('#submit').click(getActivities);
     $('#clear-markers').click(clearMarkers);
+    $('#trip').click(trip);
   }
 
   function initMap(lat, lng, zoom){
@@ -30,16 +30,17 @@
 var map;
 var loc = {};
 var markers = [];
+var waypoints = [];
 
 var directionsDisplay;
 var directionsService;
 
 /* GLOBAL MAP FUNCTIONS */
 
-function addMarker(lat, lng, name, icon){
+function addMarker(info, lat, lng, name, icon){
   'use strict';
   var latLng = new google.maps.LatLng(lat, lng);
-  var marker = new google.maps.Marker({map: map, position: latLng, title: name, animation: google.maps.Animation.DROP, icon:icon});
+  var marker = new google.maps.Marker({map: map, position: latLng, title: name, animation: google.maps.Animation.DROP, icon:icon, info:info});
   markers.push(marker);
   google.maps.event.addListener(marker, 'click', clickMarker);
 }
@@ -53,7 +54,7 @@ function geolocate(){
       loc.lng = p.coords.longitude;
       centerMap(p.coords.latitude, p.coords.longitude);
       map.setZoom(14);
-      addMarker(p.coords.latitude, p.coords.longitude, 'Me', '/img/geolocate.png');
+      addMarker(null, p.coords.latitude, p.coords.longitude, 'Me', '/img/geolocate.png');
     },
     e=>console.log(e),
     options);
@@ -68,21 +69,49 @@ function centerMap(lat, lng){
 function clickMarker(){
   'use strict';
   var pos = {};
+  pos.title = this.title || 'Anonymous';
   pos.lat = this.position.lat();
   pos.lng = this.position.lng();
-  getDirections(pos);
+  addWayPoint(pos);
+  markerInfo(this.info);
 }
 
-function getDirections(pos){
+function markerInfo(info){
   'use strict';
-  var start = new google.maps.LatLng(loc.lat, loc.lng);
-  var end = new google.maps.LatLng(pos.lat, pos.lng);
-  var request = {
-      origin:start,
-      destination:end,
-      travelMode: google.maps.TravelMode.DRIVING
-  };
+  $('#info').empty();
+  _.forOwn(info, printInfo);
+}
 
+function printInfo(value, key){
+  'use strict';
+  if (value !== 'No' && value !== '0' && key !== 'mapped_location' && key !== 'latitude' && key !== 'longitude') {
+    var $info = $('<p>');
+    $info.text(key+': '+value);
+    $('#info').append($info);
+  }
+}
+
+function addWayPoint(pos){
+  'use strict';
+  var latLng = new google.maps.LatLng(pos.lat, pos.lng);
+  waypoints.push({location:latLng, stopover:true});
+  $('#waypoints').append(`<button class=waypoint>${pos.title}</button>`);
+}
+
+function trip(){
+  'use strict';
+  var origin = new google.maps.LatLng(loc.lat, loc.lng);
+  var destination = _(waypoints).last().location;
+  var tmppoints = _(waypoints).clone();
+  tmppoints.pop();
+
+  var request = {
+    origin: origin,
+    destination: destination,
+    waypoints: tmppoints,
+    optimizeWaypoints: true,
+    travelMode: google.maps.TravelMode.DRIVING
+  };
   directionsService.route(request, (response, status)=>{
     if(status === google.maps.DirectionsStatus.OK){
       directionsDisplay.setDirections(response);
@@ -93,9 +122,12 @@ function getDirections(pos){
 function clearMarkers() {
   'use strict';
   for (var i = 0; i < markers.length; i++ ) {
-    markers[i].setMap(null);
+    if(markers[i].title !== 'Me') {
+      markers[i].setMap(null);
+    }
   }
-  markers.length = 0;
+  $('#info').empty();
+  markers.length = 1;
 }
 
 function getDistance(lat1, lon1, lat2, lon2) {
@@ -137,7 +169,9 @@ function callOpenDataForResults(activity, radius) {
       icon = '/img/marker-icons/park.png';
       break;
     case 'beer':
-      key = '3wb6-xy3j';
+      //query string limits to on-site consumption (no convienence stores, etc.)
+      //can change this later if we fully integerate across multiple datasets
+      key = '3wb6-xy3j?permit_type=ON-SALE BEER';
       name = 'business_name';
       icon = '/img/marker-icons/bar.png';
       break;
@@ -160,9 +194,14 @@ function callOpenDataForResults(activity, radius) {
       key = 'vk65-u7my';
       name = 'title';
       icon = '/img/marker-icons/history.png';
+
   }
 
-  var url = 'http://data.nashville.gov/resource/' + key + '.json?';
+  // .json? was breaking any request with a query string
+  //var url = 'http://data.nashville.gov/resource/' + key + '.json?';
+
+  var url = 'http://data.nashville.gov/resource/' + key;
+  console.log(url);
   $.getJSON(url, function(data) {
     findClosestActivities(data, radius, name, icon);
   });
@@ -184,6 +223,7 @@ function findClosestActivities(data, radius, name, icon) {
   } else {
     activities = data;
   }
+  //console.log('activities', activities);
   addActivitiesToMap(activities, name, icon);
 }
 
@@ -191,8 +231,7 @@ function addActivitiesToMap(activities, name, icon) {
   'use strict';
   $.each(activities, function(i, entry) {
     if(entry.mapped_location) {
-      window.addMarker(entry.mapped_location.latitude, entry.mapped_location.longitude, entry[name], icon);
+      window.addMarker(entry, entry.mapped_location.latitude, entry.mapped_location.longitude, entry[name], icon);
     }
   });
 }
-
