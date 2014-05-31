@@ -1,4 +1,4 @@
-/* global google */
+/* global google, _ */
 /* jshint unused:false, latedef:false */
 
 (function(){
@@ -10,6 +10,7 @@
     initMap(36.1, -86.7, 11);
     $('#geolocate').click(geolocate);
     $('#clear-markers').click(clearMarkers);
+    $('#trip').click(trip);
   }
 
   function initMap(lat, lng, zoom){
@@ -28,6 +29,7 @@
 var map;
 var loc = {};
 var markers = [];
+var waypoints = [];
 
 var directionsDisplay;
 var directionsService;
@@ -66,20 +68,38 @@ function centerMap(lat, lng){
 function clickMarker(){
   'use strict';
   var pos = {};
+  pos.title = this.position.title || 'Empty';
   pos.lat = this.position.lat();
   pos.lng = this.position.lng();
-  getDirections(pos);
+  addWayPoint(pos);
 }
 
-function getDirections(pos){
+function addWayPoint(pos){
   'use strict';
-  var start = new google.maps.LatLng(loc.lat, loc.lng);
-  var end = new google.maps.LatLng(pos.lat, pos.lng);
+  pos = new google.maps.LatLng(pos.lat, pos.lng);
+  waypoints.push({location:pos, stopover:true});
+  $('#waypoints').append(`<button class=waypoint>${pos.title}</button>`);
+}
+
+function trip(){
+  'use strict';
+
+  debugger;
+
+  var origin = new google.maps.LatLng(loc.lat, loc.lng);
+  var destination = _(waypoints).last().location;
+  var tmppoints = _(waypoints).clone();
+  tmppoints.pop();
+
   var request = {
-      origin:start,
-      destination:end,
-      travelMode: google.maps.TravelMode.DRIVING
+    origin: origin,
+    destination: destination,
+    waypoints: tmppoints,
+    optimizeWaypoints: true,
+    travelMode: google.maps.TravelMode.DRIVING
   };
+
+  debugger;
 
   directionsService.route(request, (response, status)=>{
     if(status === google.maps.DirectionsStatus.OK){
