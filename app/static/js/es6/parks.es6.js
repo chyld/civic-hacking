@@ -21,14 +21,13 @@
       parks = [];
       $.each(data, function(i, entry) {
         var dist = window.getDistance(window.loc.lat, window.loc.lng, entry.mapped_location.latitude, entry.mapped_location.longitude);
-        if(dist <= 2) {
+        if(dist <= 2) { // distance variable set by user should go here
           parks.push(entry);
         }
       });
     } else {
       parks = data;
     }
-    console.log(parks.length);
     addParksDataToMap(parks);
   }
 
