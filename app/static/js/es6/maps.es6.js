@@ -1,4 +1,5 @@
 /* global google */
+/* global _ */
 /* jshint unused:false, latedef:false */
 /* jshint camelcase:false */
 
@@ -36,10 +37,10 @@ var directionsService;
 
 /* GLOBAL MAP FUNCTIONS */
 
-function addMarker(lat, lng, name, icon){
+function addMarker(info, lat, lng, name, icon){
   'use strict';
   var latLng = new google.maps.LatLng(lat, lng);
-  var marker = new google.maps.Marker({map: map, position: latLng, title: name, animation: google.maps.Animation.DROP, icon:icon});
+  var marker = new google.maps.Marker({map: map, position: latLng, title: name, animation: google.maps.Animation.DROP, icon:icon, info:info});
   markers.push(marker);
   google.maps.event.addListener(marker, 'click', clickMarker);
 }
@@ -71,6 +72,22 @@ function clickMarker(){
   pos.lat = this.position.lat();
   pos.lng = this.position.lng();
   getDirections(pos);
+  markerInfo(this.info);
+}
+
+function markerInfo(info){
+  'use strict';
+  $('#info').empty();
+  _.forOwn(info, printInfo);
+}
+
+function printInfo(value, key){
+  'use strict';
+  if (value !== 'No' && value !== '0' && key !== 'mapped_location' && key !== 'latitude' && key !== 'longitude') {
+    var $info = $('<p>');
+    $info.text(key+': '+value);
+    $('#info').append($info);
+  }
 }
 
 function getDirections(pos){
@@ -96,6 +113,7 @@ function clearMarkers() {
     markers[i].setMap(null);
   }
   markers.length = 0;
+  $('#info').empty();
 }
 
 function getDistance(lat1, lon1, lat2, lon2) {
@@ -137,7 +155,9 @@ function callOpenDataForResults(activity, radius) {
       icon = '/img/marker-icons/park.png';
       break;
     case 'beer':
-      key = '3wb6-xy3j';
+      //query string limits to on-site consumption (no convienence stores, etc.)
+      //can change this later if we fully integerate across multiple datasets
+      key = '3wb6-xy3j?permit_type=ON-SALE BEER';
       name = 'business_name';
       icon = '/img/marker-icons/bar.png';
       break;
@@ -160,9 +180,14 @@ function callOpenDataForResults(activity, radius) {
       key = 'vk65-u7my';
       name = 'title';
       icon = '/img/marker-icons/history.png';
+
   }
 
-  var url = 'http://data.nashville.gov/resource/' + key + '.json?';
+  // .json? was breaking any request with a query string
+  //var url = 'http://data.nashville.gov/resource/' + key + '.json?';
+
+  var url = 'http://data.nashville.gov/resource/' + key;
+  console.log(url);
   $.getJSON(url, function(data) {
     findClosestActivities(data, radius, name, icon);
   });
@@ -184,6 +209,7 @@ function findClosestActivities(data, radius, name, icon) {
   } else {
     activities = data;
   }
+  //console.log('activities', activities);
   addActivitiesToMap(activities, name, icon);
 }
 
@@ -191,7 +217,7 @@ function addActivitiesToMap(activities, name, icon) {
   'use strict';
   $.each(activities, function(i, entry) {
     if(entry.mapped_location) {
-      window.addMarker(entry.mapped_location.latitude, entry.mapped_location.longitude, entry[name], icon);
+      window.addMarker(entry, entry.mapped_location.latitude, entry.mapped_location.longitude, entry[name], icon);
     }
   });
 }
