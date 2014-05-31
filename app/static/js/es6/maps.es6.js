@@ -1,5 +1,6 @@
 /* global google */
 /* jshint unused:false, latedef:false */
+/* jshint camelcase:false */
 
 (function(){
   'use strict';
@@ -9,6 +10,7 @@
   function init(){
     initMap(36.1, -86.7, 11);
     $('#geolocate').click(geolocate);
+    $('#submit').click(getActivities);
     $('#clear-markers').click(clearMarkers);
   }
 
@@ -115,3 +117,75 @@ function deg2rad(deg) {
   'use strict';
   return deg * (Math.PI/180);
 }
+
+function getActivities() {
+  'use strict';
+  var activity = $('select[name="activities"]').val();
+  var radius = $('select[name="radius"]').val();
+  callOpenDataForResults(activity, radius);
+}
+
+function callOpenDataForResults(activity, radius) {
+  'use strict';
+  var key;
+  var name;
+  switch(activity) {
+    case 'parks':
+      key = '74d7-b74t';
+      name = 'park_name';
+      break;
+    case 'beer':
+      key = '3wb6-xy3j';
+      name = 'business_name';
+      break;
+    case 'bus-stops':
+      key = 'vfe9-k7vc';
+      name = 'stopname';
+      break;
+    case 'art':
+      key = 'eviu-nxp6';
+      name = 'artwork';
+      break;
+    case 'wifi':
+      key = '4ugp-s85t';
+      name = 'site_name';
+      break;
+    case 'historical-sites':
+      key = 'vk65-u7my';
+      name = 'title';
+  }
+
+  var url = 'http://data.nashville.gov/resource/' + key + '.json?';
+  $.getJSON(url, function(data) {
+    findClosestActivities(data, radius, name);
+  });
+}
+
+function findClosestActivities(data, radius, name) {
+  'use strict';
+  var activities;
+  if(window.loc.lat) {
+    activities = [];
+    $.each(data, function(i, entry) {
+      if(entry.mapped_location) {
+        var dist = window.getDistance(window.loc.lat, window.loc.lng, entry.mapped_location.latitude, entry.mapped_location.longitude);
+        if(dist <= parseFloat(radius, 10)) {
+          activities.push(entry);
+        }
+      }
+    });
+  } else {
+    activities = data;
+  }
+  addActivitiesToMap(activities, name);
+}
+
+function addActivitiesToMap(activities, name) {
+  'use strict';
+  $.each(activities, function(i, entry) {
+    if(entry.mapped_location) {
+      window.addMarker(entry.mapped_location.latitude, entry.mapped_location.longitude, entry[name]);
+    }
+  });
+}
+
