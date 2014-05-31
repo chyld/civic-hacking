@@ -15,6 +15,10 @@
     var styles = [{'featureType':'water','elementType':'geometry','stylers':[{'color':'#ffdfa6'}]},{'featureType':'landscape','elementType':'geometry','stylers':[{'color':'#b52127'}]},{'featureType':'poi','elementType':'geometry','stylers':[{'color':'#c5531b'}]},{'featureType':'road.highway','elementType':'geometry.fill','stylers':[{'color':'#74001b'},{'lightness':-10}]},{'featureType':'road.highway','elementType':'geometry.stroke','stylers':[{'color':'#da3c3c'}]},{'featureType':'road.arterial','elementType':'geometry.fill','stylers':[{'color':'#74001b'}]},{'featureType':'road.arterial','elementType':'geometry.stroke','stylers':[{'color':'#da3c3c'}]},{'featureType':'road.local','elementType':'geometry.fill','stylers':[{'color':'#990c19'}]},{'elementType':'labels.text.fill','stylers':[{'color':'#ffffff'}]},{'elementType':'labels.text.stroke','stylers':[{'color':'#74001b'},{'lightness':-8}]},{'featureType':'transit','elementType':'geometry','stylers':[{'color':'#6a0d10'},{'visibility':'on'}]},{'featureType':'administrative','elementType':'geometry','stylers':[{'color':'#ffdfa6'},{'weight':0.4}]},{'featureType':'road.local','elementType':'geometry.stroke','stylers':[{'visibility':'off'}]}];
     var mapOptions = {center: new google.maps.LatLng(lat, lng), zoom: zoom, mapTypeId: google.maps.MapTypeId.ROADMAP, styles: styles};
     map = new google.maps.Map(document.getElementById('map'), mapOptions);
+    directionsService = new google.maps.DirectionsService();
+    directionsDisplay = new google.maps.DirectionsRenderer();
+    directionsDisplay.setMap(map);
+    directionsDisplay.setPanel(document.getElementById('directions'));
   }
 })();
 
@@ -23,6 +27,9 @@
 var map;
 var loc = {};
 var markers = [];
+
+var directionsDisplay;
+var directionsService;
 
 /* GLOBAL MAP FUNCTIONS */
 
@@ -57,5 +64,25 @@ function centerMap(lat, lng){
 
 function clickMarker(){
   'use strict';
-  alert('you clicked a marker');
+  var pos = {};
+  pos.lat = this.position.lat();
+  pos.lng = this.position.lng();
+  getDirections(pos);
+}
+
+function getDirections(pos){
+  'use strict';
+  var start = new google.maps.LatLng(loc.lat, loc.lng);
+  var end = new google.maps.LatLng(pos.lat, pos.lng);
+  var request = {
+      origin:start,
+      destination:end,
+      travelMode: google.maps.TravelMode.DRIVING
+  };
+
+  directionsService.route(request, (response, status)=>{
+    if(status === google.maps.DirectionsStatus.OK){
+      directionsDisplay.setDirections(response);
+    }
+  });
 }
