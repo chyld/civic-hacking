@@ -17,18 +17,18 @@
 
   function findClosestParks(data) {
     var parks;
-    if loc.lat {
+    if(window.loc.lat) {
       parks = [];
       $.each(data, function(i, entry) {
-        var dist = window.getDistance(loc.lat, loc.lng, entry.mapped_location.latitude, entry.mapped_location.longitude);
+        var dist = window.getDistance(window.loc.lat, window.loc.lng, entry.mapped_location.latitude, entry.mapped_location.longitude);
         if(dist <= 2) {
           parks.push(entry);
         }
       });
-      console.log(parks.count);
     } else {
       parks = data;
     }
+    console.log(parks.length);
     addParksDataToMap(parks);
   }
 
