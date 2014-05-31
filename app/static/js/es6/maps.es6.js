@@ -7,7 +7,7 @@
   $(document).ready(init);
 
   function init(){
-    initMap(36, -86, 2);
+    initMap(36.1, -86.7, 11);
     $('#geolocate').click(geolocate);
   }
 
@@ -34,12 +34,15 @@ function addMarker(lat, lng, name, icon){
   google.maps.event.addListener(marker, 'click', clickMarker);
 }
 
-
 function geolocate(){
   'use strict';
   var options = {enableHighAccuracy: true, timeout: 60000, maximumAge: 0};
   navigator.geolocation.getCurrentPosition(
-    p=>centerMap(p.coords.latitude, p.coords.longitude),
+    p=>{
+      centerMap(p.coords.latitude, p.coords.longitude);
+      map.setZoom(14);
+      addMarker(p.coords.latitude, p.coords.longitude, 'Me', '/img/geolocate.png');
+    },
     e=>console.log(e),
     options);
 }
@@ -48,10 +51,8 @@ function centerMap(lat, lng){
   'use strict';
   loc.lat = lat;
   loc.lng = lng;
-
   var latLng = new google.maps.LatLng(lat, lng);
   map.setCenter(latLng);
-  map.setZoom(10);
 }
 
 function clickMarker(){
