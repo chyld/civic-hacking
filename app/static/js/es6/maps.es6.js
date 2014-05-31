@@ -105,13 +105,30 @@ function trip(){
   var tmppoints = _(waypoints).clone();
   tmppoints.pop();
 
+  var travelMode;
+  switch($('#mode').val()){
+    case 'DRIVING':
+      travelMode = google.maps.TravelMode.DRIVING;
+      break;
+    case 'BICYCLING':
+      travelMode = google.maps.TravelMode.BICYCLING;
+      break;
+    case 'TRANSIT':
+      travelMode = google.maps.TravelMode.TRANSIT;
+      break;
+    case 'WALKING':
+      travelMode = google.maps.TravelMode.WALKING;
+      break;
+  }
+
   var request = {
     origin: origin,
     destination: destination,
     waypoints: tmppoints,
     optimizeWaypoints: true,
-    travelMode: google.maps.TravelMode.DRIVING
+    travelMode: travelMode
   };
+
   directionsService.route(request, (response, status)=>{
     if(status === google.maps.DirectionsStatus.OK){
       directionsDisplay.setDirections(response);
