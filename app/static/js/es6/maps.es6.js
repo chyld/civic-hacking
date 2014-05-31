@@ -1,7 +1,5 @@
-/* global google */
-/* global _ */
-/* jshint unused:false, latedef:false */
-/* jshint camelcase:false */
+/* global google, _ */
+/* jshint unused:false, latedef:false, camelcase:false */
 
 (function(){
   'use strict';
@@ -13,6 +11,7 @@
     $('#geolocate').click(geolocate);
     $('#submit').click(getActivities);
     $('#clear-markers').click(clearMarkers);
+    $('#trip').click(trip);
   }
 
   function initMap(lat, lng, zoom){
@@ -31,6 +30,7 @@
 var map;
 var loc = {};
 var markers = [];
+var waypoints = [];
 
 var directionsDisplay;
 var directionsService;
@@ -69,9 +69,10 @@ function centerMap(lat, lng){
 function clickMarker(){
   'use strict';
   var pos = {};
+  pos.title = this.position.title || 'Empty';
   pos.lat = this.position.lat();
   pos.lng = this.position.lng();
-  getDirections(pos);
+  addWayPoint(pos);
   markerInfo(this.info);
 }
 
@@ -90,16 +91,27 @@ function printInfo(value, key){
   }
 }
 
-function getDirections(pos){
+function addWayPoint(pos){
   'use strict';
-  var start = new google.maps.LatLng(loc.lat, loc.lng);
-  var end = new google.maps.LatLng(pos.lat, pos.lng);
-  var request = {
-      origin:start,
-      destination:end,
-      travelMode: google.maps.TravelMode.DRIVING
-  };
+  pos = new google.maps.LatLng(pos.lat, pos.lng);
+  waypoints.push({location:pos, stopover:true});
+  $('#waypoints').append(`<button class=waypoint>${pos.title}</button>`);
+}
 
+function trip(){
+  'use strict';
+  var origin = new google.maps.LatLng(loc.lat, loc.lng);
+  var destination = _(waypoints).last().location;
+  var tmppoints = _(waypoints).clone();
+  tmppoints.pop();
+
+  var request = {
+    origin: origin,
+    destination: destination,
+    waypoints: tmppoints,
+    optimizeWaypoints: true,
+    travelMode: google.maps.TravelMode.DRIVING
+  };
   directionsService.route(request, (response, status)=>{
     if(status === google.maps.DirectionsStatus.OK){
       directionsDisplay.setDirections(response);
@@ -220,4 +232,3 @@ function addActivitiesToMap(activities, name, icon) {
     }
   });
 }
-
