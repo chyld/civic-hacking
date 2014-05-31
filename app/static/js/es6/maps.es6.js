@@ -182,14 +182,12 @@ function callOpenDataForResults(activity, radius) {
       key = 'vk65-u7my';
       name = 'title';
       icon = '/img/marker-icons/history.png';
-
   }
 
   // .json? was breaking any request with a query string
   //var url = 'http://data.nashville.gov/resource/' + key + '.json?';
 
   var url = 'http://data.nashville.gov/resource/' + key;
-  console.log(url);
   $.getJSON(url, function(data) {
     findClosestActivities(data, radius, name, icon);
   });
@@ -211,7 +209,6 @@ function findClosestActivities(data, radius, name, icon) {
   } else {
     activities = data;
   }
-  //console.log('activities', activities);
   addActivitiesToMap(activities, name, icon);
 }
 
