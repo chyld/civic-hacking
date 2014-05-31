@@ -39,6 +39,8 @@ function geolocate(){
   var options = {enableHighAccuracy: true, timeout: 60000, maximumAge: 0};
   navigator.geolocation.getCurrentPosition(
     p=>{
+      loc.lat = p.coords.latitude;
+      loc.lng = p.coords.longitude;
       centerMap(p.coords.latitude, p.coords.longitude);
       map.setZoom(14);
       addMarker(p.coords.latitude, p.coords.longitude, 'Me', '/img/geolocate.png');
@@ -49,9 +51,7 @@ function geolocate(){
 
 function centerMap(lat, lng){
   'use strict';
-  loc.lat = lat;
-  loc.lng = lng;
-  var latLng = new google.maps.LatLng(lat, lng);
+  var latLng = new google.maps.LatLng(loc.lat, loc.lng);
   map.setCenter(latLng);
 }
 
