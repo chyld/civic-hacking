@@ -15,7 +15,6 @@
   }
 
   function receive(data){
-    console.log(data[0]);
     data.forEach(plotOnMap);
   }
 
