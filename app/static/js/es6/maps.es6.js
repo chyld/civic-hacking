@@ -9,6 +9,7 @@
   function init(){
     initMap(36.1, -86.7, 11);
     $('#geolocate').click(geolocate);
+    $('#clear-markers').click(clearMarkers);
   }
 
   function initMap(lat, lng, zoom){
@@ -85,6 +86,14 @@ function getDirections(pos){
       directionsDisplay.setDirections(response);
     }
   });
+}
+
+function clearMarkers() {
+  'use strict';
+  for (var i = 0; i < markers.length; i++ ) {
+    markers[i].setMap(null);
+  }
+  markers.length = 0;
 }
 
 function getDistance(lat1, lon1, lat2, lon2) {
