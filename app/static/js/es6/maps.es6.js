@@ -7,7 +7,7 @@
   $(document).ready(init);
 
   function init(){
-    initMap(36, -86, 8);
+    initMap(36.1, -86.75, 11);
     $('#geolocate').click(geolocate);
     $('#map').css({
       'height': winHeight,
@@ -64,6 +64,8 @@ function addMarker(info, lat, lng, name, icon, type){
 
 function geolocate(){
   'use strict';
+  $('#showLeftPush').removeClass('hide');
+  $('#geolocate').addClass('hide');
   var options = {enableHighAccuracy: true, timeout: 60000, maximumAge: 0};
   navigator.geolocation.getCurrentPosition(
     p=>{
@@ -124,6 +126,7 @@ function removeWayPoint(){
   waypoints.splice(i, 1);
   savMarkers[i+1].setMap(null);
   savMarkers.splice(i+1, 1);
+  trip();
 }
 
 function trip(){
@@ -151,6 +154,11 @@ function trip(){
   });
 }
 
+function clearDirections(){
+  'use strict';
+  directionsDisplay.set('directions', null);
+}
+
 function clearTmpMarkers() {
   'use strict';
   for (var i = 0; i < tmpMarkers.length; i++ ) {
@@ -159,6 +167,8 @@ function clearTmpMarkers() {
 
   tmpMarkers = [];
   $('#info').empty();
+
+  clearDirections();
 }
 
 function getDistance(lat1, lon1, lat2, lon2) {
