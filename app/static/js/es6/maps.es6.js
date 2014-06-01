@@ -301,7 +301,7 @@ function getFoodData(radius){
       if (status === google.maps.GeocoderStatus.OK) {
         location.lat = restaurant[0].geometry.location.lat();
         location.lng = restaurant[0].geometry.location.lng();
-        addMarker(location, location.lat, location.lng, location.name, '/img/marker-icons/treasure.png');
+        addMarker(location, location.lat, location.lng, location.name, '/img/marker-icons/food.png');
       }
       else {
         alert(status);
