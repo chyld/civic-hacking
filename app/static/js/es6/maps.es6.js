@@ -12,6 +12,7 @@
     $('#submit').click(getActivities);
     $('#clear-tmp-markers').click(clearTmpMarkers);
     $('#trip').click(trip);
+    $('#waypoints').on('click', '.waypoint', removeWayPoint);
   }
 
   function initMap(lat, lng, zoom){
@@ -104,6 +105,13 @@ function addWayPoint(pos){
   var latLng = new google.maps.LatLng(pos.lat, pos.lng);
   waypoints.push({location:latLng, stopover:true});
   $('#waypoints').append(`<button class=waypoint>${pos.title}</button>`);
+}
+
+function removeWayPoint(){
+  'use strict';
+  var i = $('.waypoint').index(this);
+  this.remove();
+  waypoints.splice(i, 1);
 }
 
 function trip(){
@@ -222,10 +230,9 @@ function callOpenDataForResults(activity, radius) {
   }
 
   // .json? was breaking any request with a query string
-  //var url = 'http://data.nashville.gov/resource/' + key + '.json?';
+  // var url = 'http://data.nashville.gov/resource/' + key + '.json?';
 
   var url = 'http://data.nashville.gov/resource/' + key;
-  console.log(url);
   $.getJSON(url, function(data) {
     findClosestActivities(data, radius, name, icon);
   });
