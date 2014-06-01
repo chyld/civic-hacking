@@ -1,4 +1,4 @@
-/* global google, _ */
+/* global google, _, addMarker */
 /* jshint unused:false, latedef:false, camelcase:false */
 
 (function(){
@@ -18,8 +18,9 @@
       });
     });
     $('#submit').click(getActivities);
-    $('#clear-markers').click(clearMarkers);
+    $('#clear-tmp-markers').click(clearTmpMarkers);
     $('#trip').click(trip);
+    $('#waypoints').on('click', '.waypoint', removeWayPoint);
   }
 
   function initMap(lat, lng, zoom){
@@ -38,7 +39,8 @@
 var winHeight = $(window).height();
 var map;
 var loc = {};
-var markers = [];
+var tmpMarkers = [];
+var savMarkers = [];
 var waypoints = [];
 
 var directionsDisplay;
@@ -46,11 +48,17 @@ var directionsService;
 
 /* GLOBAL MAP FUNCTIONS */
 
-function addMarker(info, lat, lng, name, icon){
+function addMarker(info, lat, lng, name, icon, type){
   'use strict';
   var latLng = new google.maps.LatLng(lat, lng);
   var marker = new google.maps.Marker({map: map, position: latLng, title: name, animation: google.maps.Animation.DROP, icon:icon, info:info});
-  markers.push(marker);
+
+  if(type === 'save'){
+    savMarkers.push(marker);
+  }else{
+    tmpMarkers.push(marker);
+  }
+
   google.maps.event.addListener(marker, 'click', clickMarker);
 }
 
@@ -63,7 +71,7 @@ function geolocate(){
       loc.lng = p.coords.longitude;
       centerMap(p.coords.latitude, p.coords.longitude);
       map.setZoom(14);
-      addMarker(null, p.coords.latitude, p.coords.longitude, 'Me', '/img/geolocate.png');
+      addMarker(null, p.coords.latitude, p.coords.longitude, 'Me', '/img/geolocate.png', 'save');
     },
     e=>console.log(e),
     options);
@@ -82,6 +90,8 @@ function clickMarker(){
   pos.lat = this.position.lat();
   pos.lng = this.position.lng();
   addWayPoint(pos);
+  _(tmpMarkers).pull(this);
+  savMarkers.push(this);
   markerInfo(this.info);
 }
 
@@ -107,6 +117,15 @@ function addWayPoint(pos){
   $('#waypoints').append(`<button class=waypoint>${pos.title}</button>`);
 }
 
+function removeWayPoint(){
+  'use strict';
+  var i = $('.waypoint').index(this);
+  this.remove();
+  waypoints.splice(i, 1);
+  savMarkers[i+1].setMap(null);
+  savMarkers.splice(i+1, 1);
+}
+
 function trip(){
   'use strict';
   var origin = new google.maps.LatLng(loc.lat, loc.lng);
@@ -114,27 +133,14 @@ function trip(){
   var tmppoints = _(waypoints).clone();
   tmppoints.pop();
 
-  var travelMode;
-  switch($('#mode').val()){
-    case 'DRIVING':
-      travelMode = google.maps.TravelMode.DRIVING;
-      break;
-    case 'BICYCLING':
-      travelMode = google.maps.TravelMode.BICYCLING;
-      break;
-    case 'TRANSIT':
-      travelMode = google.maps.TravelMode.TRANSIT;
-      break;
-    case 'WALKING':
-      travelMode = google.maps.TravelMode.WALKING;
-      break;
-  }
+  var mode = $('#mode').val();
+  var travelMode = google.maps.TravelMode[mode];
 
   var request = {
     origin: origin,
     destination: destination,
     waypoints: tmppoints,
-    optimizeWaypoints: true,
+    optimizeWaypoints: false,
     travelMode: travelMode
   };
 
@@ -145,15 +151,14 @@ function trip(){
   });
 }
 
-function clearMarkers() {
+function clearTmpMarkers() {
   'use strict';
-  for (var i = 0; i < markers.length; i++ ) {
-    if(markers[i].title !== 'Me') {
-      markers[i].setMap(null);
-    }
+  for (var i = 0; i < tmpMarkers.length; i++ ) {
+    tmpMarkers[i].setMap(null);
   }
+
+  tmpMarkers = [];
   $('#info').empty();
-  markers.length = 1;
 }
 
 function getDistance(lat1, lon1, lat2, lon2) {
@@ -185,6 +190,9 @@ function getActivities() {
 
 function callOpenDataForResults(activity, radius) {
   'use strict';
+  if(activity === 'restaurants') {
+    return getFoodData(radius);
+  }
   var key;
   var name;
   var icon;
@@ -220,14 +228,12 @@ function callOpenDataForResults(activity, radius) {
       key = 'vk65-u7my';
       name = 'title';
       icon = '/img/marker-icons/history.png';
-
   }
 
   // .json? was breaking any request with a query string
-  //var url = 'http://data.nashville.gov/resource/' + key + '.json?';
+  // var url = 'http://data.nashville.gov/resource/' + key + '.json?';
 
   var url = 'http://data.nashville.gov/resource/' + key;
-  console.log(url);
   $.getJSON(url, function(data) {
     findClosestActivities(data, radius, name, icon);
   });
@@ -249,7 +255,6 @@ function findClosestActivities(data, radius, name, icon) {
   } else {
     activities = data;
   }
-  //console.log('activities', activities);
   addActivitiesToMap(activities, name, icon);
 }
 
@@ -257,7 +262,39 @@ function addActivitiesToMap(activities, name, icon) {
   'use strict';
   $.each(activities, function(i, entry) {
     if(entry.mapped_location) {
-      window.addMarker(entry, entry.mapped_location.latitude, entry.mapped_location.longitude, entry[name], icon);
+      addMarker(entry, entry.mapped_location.latitude, entry.mapped_location.longitude, entry[name], icon, 'temp');
     }
   });
 }
+
+function getFoodData(radius){
+    'use strict';
+    var meters = parseFloat(radius, 10) * 1609.34;
+    var url = 'http://api.yelp.com/business_review_search?term=yelp&lat=' + window.loc.lat + '&long=' + window.loc.lng + '&radius_filter=' + meters + '&limit=10&ywsid=EJDoFH3OEMV8iJKwE3pfag&category=restaurants&callback=?';
+    $.getJSON(url, addRestaurantsToMap);
+  }
+
+  function addRestaurantsToMap(data){
+    'use strict';
+    $.each(data.businesses, function(i, business) {
+      formatRestaurant(business);
+    });
+  }
+
+  function formatRestaurant(entry) {
+    'use strict';
+    var geocoder = new google.maps.Geocoder();
+    var address = entry.address1 + ',' + entry.city + ',' + entry.state + ',' + entry.country + ',' + entry.zip;
+    var location = {};
+    location.name = entry.name;
+    geocoder.geocode({ 'address' : address }, function(restaurant, status) {
+      if (status === google.maps.GeocoderStatus.OK) {
+        location.lat = restaurant[0].geometry.location.lat();
+        location.lng = restaurant[0].geometry.location.lng();
+        addMarker(location, location.lat, location.lng, location.name, '/img/marker-icons/treasure.png');
+      }
+      else {
+        alert(status);
+      }
+    });
+  }

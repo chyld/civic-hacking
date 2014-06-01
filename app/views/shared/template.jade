@@ -36,20 +36,20 @@ html
         option(value='TRANSIT') Buses
         option(value='WALKING') Walk
       button.btn.btn-default#submit Submit
-      button.btn.btn-default#clear-markers Clear Map
+      button.btn.btn-default#clear-tmp-markers Clear Map
       button.btn.btn-default#trip Trip
-      #info
       #directions
+      #info
+
 
     .container
       header.page-header
         .center-block#logo
-        //- img.img-responsive#logo(src='/img/itnerary.svg')
+
     section
       button.btn.btn-primary.btn-lg#geolocate Find Me!
       button.btn.btn-primary.btn-lg#showLeftPush Start Planning
     block content
-
 
     script(src='/js/vendor/jquery-2.1.1.min.js')
     script(src='/js/vendor/lodash-2.4.1.min.js')
@@ -67,6 +67,7 @@ html
     script(src='/js/es6/compiled/art.js')
     script(src='/js/es6/compiled/wifi.js')
     script(src='/js/es6/compiled/history.js')
+    script(src='/js/es6/compiled/food.js')
     script.
       var menuLeft = document.getElementById( 'cbp-spmenu-s1' ),
         showLeftPush = document.getElementById( 'showLeftPush' ),
