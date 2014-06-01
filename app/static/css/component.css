@@ -128,13 +128,16 @@
 
 .cbp-spmenu-push {
 	overflow-x: hidden;
-	position: relative;
+	position: absolute;
 	left: 0;
 }
 
 .cbp-spmenu-push-toright {
 	left: 240px;
+	/*left: 0;*/
+	width: calc(100% - 240px) !important;
 }
+
 
 .cbp-spmenu-push-toleft {
 	left: -240px;
