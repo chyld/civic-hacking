@@ -1,4 +1,4 @@
-/* global google, _ */
+/* global google, _, addMarker */
 /* jshint unused:false, latedef:false, camelcase:false */
 
 (function(){
@@ -159,6 +159,9 @@ function getActivities() {
 
 function callOpenDataForResults(activity, radius) {
   'use strict';
+  if(activity === 'restaurants') {
+    return getFoodData(radius);
+  }
   var key;
   var name;
   var icon;
@@ -232,3 +235,35 @@ function addActivitiesToMap(activities, name, icon) {
     }
   });
 }
+
+function getFoodData(radius){
+    'use strict';
+    var meters = parseFloat(radius, 10) * 1609.34;
+    var url = 'http://api.yelp.com/business_review_search?term=yelp&lat=' + window.loc.lat + '&long=' + window.loc.lng + '&radius_filter=' + meters + '&limit=10&ywsid=EJDoFH3OEMV8iJKwE3pfag&category=restaurants&callback=?';
+    $.getJSON(url, addRestaurantsToMap);
+  }
+
+  function addRestaurantsToMap(data){
+    'use strict';
+    $.each(data.businesses, function(i, business) {
+      formatRestaurant(business);
+    });
+  }
+
+  function formatRestaurant(entry) {
+    'use strict';
+    var geocoder = new google.maps.Geocoder();
+    var address = entry.address1 + ',' + entry.city + ',' + entry.state + ',' + entry.country + ',' + entry.zip;
+    var location = {};
+    location.name = entry.name;
+    geocoder.geocode({ 'address' : address }, function(restaurant, status) {
+      if (status === google.maps.GeocoderStatus.OK) {
+        location.lat = restaurant[0].geometry.location.lat();
+        location.lng = restaurant[0].geometry.location.lng();
+        addMarker(location, location.lat, location.lng, location.name, '/img/marker-icons/treasure.png');
+      }
+      else {
+        alert(status);
+      }
+    });
+  }
