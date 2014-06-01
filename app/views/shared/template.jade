@@ -44,13 +44,14 @@ html
         #directions
       .contain
         #info
-    .container
-      header.page-header
-        img.img-responsive.logoshadow#logo(src='/img/itnerary.svg')
-        span.glyphicon.glyphicon-align-justify.hide
-    section
-      button.fancy.btn-1.btn-1d#geolocate Find Me!
-    block content
+    .pagecontain
+      .container
+        header.page-header
+          img.img-responsive.logoshadow#logo(src='/img/itnerary.svg')
+          span.glyphicon.glyphicon-align-justify.hide
+      section
+        button.fancy.btn-1.btn-1d#geolocate Find Me!
+      block content
 
     script(src='/js/vendor/jquery-2.1.1.min.js')
     script(src='/js/vendor/lodash-2.4.1.min.js')
