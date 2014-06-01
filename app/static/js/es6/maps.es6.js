@@ -22,9 +22,10 @@
     $('#trip').click(trip);
     $('#waypoints').on('click', '.waypoint', removeWayPoint);
     $('#waypoints').on('mousedown', '.waypoint', getSortedPoint);
-    makeSortable();
+    $('#mode').change(trip);
     $('.glyphicon-arrow-left').click(hidePlanningMenu);
     $('.glyphicon-align-justify').click(showPlanningMenu);
+    makeSortable();
   }
 
   function initMap(lat, lng, zoom){
