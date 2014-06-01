@@ -25,12 +25,24 @@
 
   function initMap(lat, lng, zoom){
     var styles = [{'featureType':'water','elementType':'geometry','stylers':[{'color':'#a2daf2'}]}];
-    var mapOptions = {center: new google.maps.LatLng(lat, lng), zoom: zoom, mapTypeId: google.maps.MapTypeId.ROADMAP, styles: styles};
+    var mapOptions = {
+      center: new google.maps.LatLng(lat, lng),
+      zoom: zoom,
+      mapTypeId: google.maps.MapTypeId.ROADMAP,
+      styles: styles
+    };
+
     map = new google.maps.Map(document.getElementById('map'), mapOptions);
     directionsService = new google.maps.DirectionsService();
     directionsDisplay = new google.maps.DirectionsRenderer();
     directionsDisplay.setMap(map);
     directionsDisplay.setPanel(document.getElementById('directions'));
+
+    weatherLayer = new google.maps.weather.WeatherLayer({temperatureUnits: google.maps.weather.TemperatureUnit.FAHRENHEIT});
+    weatherLayer.setMap(map);
+
+    cloudLayer = new google.maps.weather.CloudLayer();
+    cloudLayer.setMap(map);
   }
 })();
 
@@ -45,13 +57,15 @@ var waypoints = [];
 
 var directionsDisplay;
 var directionsService;
+var weatherLayer;
+var cloudLayer;
 
 /* GLOBAL MAP FUNCTIONS */
 
 function addMarker(info, lat, lng, name, icon, type){
   'use strict';
   var latLng = new google.maps.LatLng(lat, lng);
-  var marker = new google.maps.Marker({map: map, position: latLng, title: name, animation: google.maps.Animation.DROP, icon:icon, info:info});
+  var marker = new google.maps.Marker({map: map, position: latLng, title: name, icon:icon, info:info});
 
   if(type === 'save'){
     savMarkers.push(marker);
