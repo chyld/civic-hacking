@@ -80,7 +80,7 @@ function addMarker(info, lat, lng, name, icon, type){
 
 function geolocate(){
   'use strict';
-  $('#geolocate').html('Loading...').removeClass('btn-primary').addClass('btn-default').off('click');
+  $('#geolocate').replaceWith('<img src="/img/loadr.gif" id="loading"/>').off('click');
   var options = {enableHighAccuracy: true, timeout: 60000, maximumAge: 0};
   navigator.geolocation.getCurrentPosition(
     p=>{
@@ -89,7 +89,7 @@ function geolocate(){
       centerMap(p.coords.latitude, p.coords.longitude);
       map.setZoom(14);
       addMarker(null, p.coords.latitude, p.coords.longitude, 'Me', '/img/geolocate.png', 'save');
-      $('#geolocate').addClass('hide');
+      $('#loading').addClass('hide');
       showPlanningMenu();
     },
     e=>console.log(e),
