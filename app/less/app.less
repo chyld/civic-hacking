@@ -22,6 +22,20 @@ html, body, #map{
   }
 }
 
+
+
+p.waypoint:not(:first-child)::before {
+  content: ' >';
+  color: #fff;
+  padding-right: 10px;
+}
+
+p.waypoint::after {
+  content: ' x';
+  color: red;
+  padding-left: 5px;
+}
+
 .logoshadow {
   -webkit-filter: drop-shadow( 5px 5px 5px #333 );
   filter: drop-shadow( 5px 5px 5px #000 );
@@ -162,9 +176,9 @@ section{
 .waypoint {
   float: left;
   padding: 10px;
-  border: 2px solid black;
+  font-weight: 700;
   margin-top: 10px;
-  color: black;
+  color: #0D77B6;
 }
 
 #submit, #clear-tmp-markers, #trip{
