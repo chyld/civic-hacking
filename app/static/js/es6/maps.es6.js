@@ -13,6 +13,7 @@
     $('#clear-markers').click(clearMarkers);
     $('#trip').click(trip);
     $('#waypoints').on('click', '.waypoint', removeWayPoint);
+    makeSortable();
   }
 
   function initMap(lat, lng, zoom){
@@ -37,6 +38,11 @@ var directionsDisplay;
 var directionsService;
 
 /* GLOBAL MAP FUNCTIONS */
+
+function makeSortable(){
+  'use strict';
+  $('#waypoints').sortable();
+}
 
 function addMarker(info, lat, lng, name, icon){
   'use strict';
@@ -96,7 +102,8 @@ function addWayPoint(pos){
   'use strict';
   var latLng = new google.maps.LatLng(pos.lat, pos.lng);
   waypoints.push({location:latLng, stopover:true});
-  $('#waypoints').append(`<button class=waypoint>${pos.title}</button>`);
+  $('#waypoints').append(`<p class=waypoint>${pos.title}</p>`);
+  makeSortable();
 }
 
 function removeWayPoint(){
