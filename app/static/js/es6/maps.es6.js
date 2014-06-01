@@ -81,7 +81,8 @@ function clickMarker(){
   pos.lat = this.position.lat();
   pos.lng = this.position.lng();
   addWayPoint(pos);
-  savMarkers.push(_(tmpMarkers).pull(this));
+  _(tmpMarkers).pull(this);
+  savMarkers.push(this);
   markerInfo(this.info);
 }
 
@@ -112,6 +113,8 @@ function removeWayPoint(){
   var i = $('.waypoint').index(this);
   this.remove();
   waypoints.splice(i, 1);
+  savMarkers[i+1].setMap(null);
+  savMarkers.splice(i+1, 1);
 }
 
 function trip(){
@@ -121,27 +124,14 @@ function trip(){
   var tmppoints = _(waypoints).clone();
   tmppoints.pop();
 
-  var travelMode;
-  switch($('#mode').val()){
-    case 'DRIVING':
-      travelMode = google.maps.TravelMode.DRIVING;
-      break;
-    case 'BICYCLING':
-      travelMode = google.maps.TravelMode.BICYCLING;
-      break;
-    case 'TRANSIT':
-      travelMode = google.maps.TravelMode.TRANSIT;
-      break;
-    case 'WALKING':
-      travelMode = google.maps.TravelMode.WALKING;
-      break;
-  }
+  var mode = $('#mode').val();
+  var travelMode = google.maps.TravelMode[mode];
 
   var request = {
     origin: origin,
     destination: destination,
     waypoints: tmppoints,
-    optimizeWaypoints: true,
+    optimizeWaypoints: false,
     travelMode: travelMode
   };
 
