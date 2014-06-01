@@ -10,7 +10,7 @@
     initMap(36.1, -86.7, 11);
     $('#geolocate').click(geolocate);
     $('#submit').click(getActivities);
-    $('#clear-markers').click(clearMarkers);
+    $('#clear-tmp-markers').click(clearTmpMarkers);
     $('#trip').click(trip);
   }
 
@@ -21,7 +21,7 @@
     directionsService = new google.maps.DirectionsService();
     directionsDisplay = new google.maps.DirectionsRenderer();
     directionsDisplay.setMap(map);
-    directionsDisplay.setPanel(document.getElementById('directions'));    
+    directionsDisplay.setPanel(document.getElementById('directions'));
   }
 })();
 
@@ -29,7 +29,8 @@
 
 var map;
 var loc = {};
-var markers = [];
+var tmpMarkers = [];
+var savMarkers = [];
 var waypoints = [];
 
 var directionsDisplay;
@@ -37,11 +38,17 @@ var directionsService;
 
 /* GLOBAL MAP FUNCTIONS */
 
-function addMarker(info, lat, lng, name, icon){
+function addMarker(info, lat, lng, name, icon, type){
   'use strict';
   var latLng = new google.maps.LatLng(lat, lng);
   var marker = new google.maps.Marker({map: map, position: latLng, title: name, animation: google.maps.Animation.DROP, icon:icon, info:info});
-  markers.push(marker);
+
+  if(type === 'save'){
+    savMarkers.push(marker);
+  }else{
+    tmpMarkers.push(marker);
+  }
+
   google.maps.event.addListener(marker, 'click', clickMarker);
 }
 
@@ -54,7 +61,7 @@ function geolocate(){
       loc.lng = p.coords.longitude;
       centerMap(p.coords.latitude, p.coords.longitude);
       map.setZoom(14);
-      addMarker(null, p.coords.latitude, p.coords.longitude, 'Me', '/img/geolocate.png');
+      addMarker(null, p.coords.latitude, p.coords.longitude, 'Me', '/img/geolocate.png', 'save');
     },
     e=>console.log(e),
     options);
@@ -73,6 +80,7 @@ function clickMarker(){
   pos.lat = this.position.lat();
   pos.lng = this.position.lng();
   addWayPoint(pos);
+  savMarkers.push(_(tmpMarkers).pull(this));
   markerInfo(this.info);
 }
 
@@ -136,15 +144,14 @@ function trip(){
   });
 }
 
-function clearMarkers() {
+function clearTmpMarkers() {
   'use strict';
-  for (var i = 0; i < markers.length; i++ ) {
-    if(markers[i].title !== 'Me') {
-      markers[i].setMap(null);
-    }
+  for (var i = 0; i < tmpMarkers.length; i++ ) {
+    tmpMarkers[i].setMap(null);
   }
+
+  tmpMarkers = [];
   $('#info').empty();
-  markers.length = 1;
 }
 
 function getDistance(lat1, lon1, lat2, lon2) {
@@ -248,7 +255,7 @@ function addActivitiesToMap(activities, name, icon) {
   'use strict';
   $.each(activities, function(i, entry) {
     if(entry.mapped_location) {
-      window.addMarker(entry, entry.mapped_location.latitude, entry.mapped_location.longitude, entry[name], icon);
+      addMarker(entry, entry.mapped_location.latitude, entry.mapped_location.longitude, entry[name], icon, 'temp');
     }
   });
 }
