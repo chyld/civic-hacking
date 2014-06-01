@@ -126,7 +126,7 @@ function removeWayPoint(){
   waypoints.splice(i, 1);
   savMarkers[i+1].setMap(null);
   savMarkers.splice(i+1, 1);
-  clearDirections();
+  trip();
 }
 
 function trip(){
@@ -167,6 +167,8 @@ function clearTmpMarkers() {
 
   tmpMarkers = [];
   $('#info').empty();
+
+  clearDirections();
 }
 
 function getDistance(lat1, lon1, lat2, lon2) {
