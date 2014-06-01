@@ -4,8 +4,8 @@ html
     meta(charset='utf-8')
     meta(name='viewport' content='width=device-width, initial-scale=1')
     title= title
-    link(href='/css/normalize.css', rel='stylesheet')
-    link(href='/css/buttons.css', rel='stylesheet')
+    link(href='/css/normalize.min.css', rel='stylesheet')
+    link(href='/css/buttons.min.css', rel='stylesheet')
     link(rel='stylesheet', type='text/css', href='css/default.css')
     link(rel='stylesheet', type='text/css', href='css/component.css')
     link(rel='stylesheet' href='//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css')
@@ -15,38 +15,47 @@ html
   body.cbp-spmenu-push
     nav.cbp-spmenu.cbp-spmenu-vertical.cbp-spmenu-left#cbp-spmenu-s1
       h3 Menu
-      select
-        option Activity Type
-        option Arts
-        option Bar
-        option Bus Stop
-        option Food Trucks
-        option Historic
-        option Parks
-        option Wifi
-      select
-        option Distance
-        option 1 Mile
-        option 3 Miles
-        option 5 Miles
-        option 10 Miles
-        option 15 Miles
-      button GO!
+      label Activity Type:
+      select.form-control(name='activities')
+        option(value='parks', selected='selected') Parks
+        option(value='beer') Beer
+        option(value='bus-stops') Bus Stops
+        option(value='art') Art
+        option(value='wifi') Public Wifi
+        option(value='historical-sites') Historical Sites
+      label Distance:
+      select.form-control(name='radius')
+        option(value='.5', selected='selected') 1/2 mile
+        option(value='1') 1 mile
+        option(value='2') 2 miles
+        option(value='5') 5 miles
+        option(value='10') 10 miles
+      label Travel Mode:
+      select.form-control#mode
+        option(value='DRIVING', selected='selected') Drive
+        option(value='BICYCLING') Bicycle
+        option(value='TRANSIT') Buses
+        option(value='WALKING') Walk
+      button.btn.btn-default#submit Submit
+      button.btn.btn-default#clear-markers Clear Map
+      button.btn.btn-default#trip Trip
     .container
-      header.clearfix
-        span iTNerary
-    .main
-      section
-        button#showLeftPush Start Planning
+      header.page-header
+        .center-block#logo
+        //- img.img-responsive#logo(src='/img/itnerary.svg')
+    section
+      button.btn.btn-primary.btn-lg#geolocate Find Me!
+      button.btn.btn-primary.btn-lg#showLeftPush Start Planning
     block content
 
-    script(src='/js/vendor/jquery-2.1.1.js')
-    script(src='/js/vendor/lodash-2.4.1.js')
-    script(src='/js/vendor/moment-2.6.0.js')
-    script(src='/js/vendor/buttons.js')
-    script(src='/js/vendor/traceur.js')
+
+    script(src='/js/vendor/jquery-2.1.1.min.js')
+    script(src='/js/vendor/lodash-2.4.1.min.js')
+    script(src='/js/vendor/moment-2.6.0.min.js')
     script(src='/js/vendor/modernizr.custom.js')
     script(src='/js/vendor/classie.js')
+    script(src='/js/vendor/buttons.min.js')
+    script(src='/js/vendor/traceur.min.js')
     script(src='https://maps.googleapis.com/maps/api/js?key=AIzaSyD4sNttD_i7PtUfNbANpfyCNt2FRMWzkHY&sensor=true')
     script(src='/js/es6/compiled/main.js')
     script(src='/js/es6/compiled/maps.js')

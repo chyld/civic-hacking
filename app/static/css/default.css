@@ -135,7 +135,7 @@ a:hover {
 	width: 100%;
 	cursor: pointer;
 	margin: 10px 0;
-	font-size: 0.8em;
+	/*font-size: 0.8em;*/
 }
 
 .main > section button:hover {
@@ -151,7 +151,7 @@ a:hover {
 	pointer-events: none;
 }
 
-.icon-drop:before, 
+.icon-drop:before,
 .icon-arrow-left:before {
 	font-family: 'fontawesome';
 	position: absolute;
@@ -180,4 +180,3 @@ a:hover {
 .icon-arrow-left:before {
 	content: "\f060";
 }
-
