@@ -10,8 +10,9 @@
     initMap(36.1, -86.7, 11);
     $('#geolocate').click(geolocate);
     $('#submit').click(getActivities);
-    $('#clear-markers').click(clearMarkers);
+    $('#clear-tmp-markers').click(clearTmpMarkers);
     $('#trip').click(trip);
+    $('#waypoints').on('click', '.waypoint', removeWayPoint);
   }
 
   function initMap(lat, lng, zoom){
@@ -29,7 +30,8 @@
 
 var map;
 var loc = {};
-var markers = [];
+var tmpMarkers = [];
+var savMarkers = [];
 var waypoints = [];
 
 var directionsDisplay;
@@ -37,11 +39,17 @@ var directionsService;
 
 /* GLOBAL MAP FUNCTIONS */
 
-function addMarker(info, lat, lng, name, icon){
+function addMarker(info, lat, lng, name, icon, type){
   'use strict';
   var latLng = new google.maps.LatLng(lat, lng);
   var marker = new google.maps.Marker({map: map, position: latLng, title: name, animation: google.maps.Animation.DROP, icon:icon, info:info});
-  markers.push(marker);
+
+  if(type === 'save'){
+    savMarkers.push(marker);
+  }else{
+    tmpMarkers.push(marker);
+  }
+
   google.maps.event.addListener(marker, 'click', clickMarker);
 }
 
@@ -54,7 +62,7 @@ function geolocate(){
       loc.lng = p.coords.longitude;
       centerMap(p.coords.latitude, p.coords.longitude);
       map.setZoom(14);
-      addMarker(null, p.coords.latitude, p.coords.longitude, 'Me', '/img/geolocate.png');
+      addMarker(null, p.coords.latitude, p.coords.longitude, 'Me', '/img/geolocate.png', 'save');
     },
     e=>console.log(e),
     options);
@@ -73,6 +81,8 @@ function clickMarker(){
   pos.lat = this.position.lat();
   pos.lng = this.position.lng();
   addWayPoint(pos);
+  _(tmpMarkers).pull(this);
+  savMarkers.push(this);
   markerInfo(this.info);
 }
 
@@ -98,6 +108,15 @@ function addWayPoint(pos){
   $('#waypoints').append(`<button class=waypoint>${pos.title}</button>`);
 }
 
+function removeWayPoint(){
+  'use strict';
+  var i = $('.waypoint').index(this);
+  this.remove();
+  waypoints.splice(i, 1);
+  savMarkers[i+1].setMap(null);
+  savMarkers.splice(i+1, 1);
+}
+
 function trip(){
   'use strict';
   var origin = new google.maps.LatLng(loc.lat, loc.lng);
@@ -105,13 +124,17 @@ function trip(){
   var tmppoints = _(waypoints).clone();
   tmppoints.pop();
 
+  var mode = $('#mode').val();
+  var travelMode = google.maps.TravelMode[mode];
+
   var request = {
     origin: origin,
     destination: destination,
     waypoints: tmppoints,
-    optimizeWaypoints: true,
-    travelMode: google.maps.TravelMode.DRIVING
+    optimizeWaypoints: false,
+    travelMode: travelMode
   };
+
   directionsService.route(request, (response, status)=>{
     if(status === google.maps.DirectionsStatus.OK){
       directionsDisplay.setDirections(response);
@@ -119,15 +142,14 @@ function trip(){
   });
 }
 
-function clearMarkers() {
+function clearTmpMarkers() {
   'use strict';
-  for (var i = 0; i < markers.length; i++ ) {
-    if(markers[i].title !== 'Me') {
-      markers[i].setMap(null);
-    }
+  for (var i = 0; i < tmpMarkers.length; i++ ) {
+    tmpMarkers[i].setMap(null);
   }
+
+  tmpMarkers = [];
   $('#info').empty();
-  markers.length = 1;
 }
 
 function getDistance(lat1, lon1, lat2, lon2) {
@@ -200,7 +222,7 @@ function callOpenDataForResults(activity, radius) {
   }
 
   // .json? was breaking any request with a query string
-  //var url = 'http://data.nashville.gov/resource/' + key + '.json?';
+  // var url = 'http://data.nashville.gov/resource/' + key + '.json?';
 
   var url = 'http://data.nashville.gov/resource/' + key;
   $.getJSON(url, function(data) {
@@ -231,7 +253,7 @@ function addActivitiesToMap(activities, name, icon) {
   'use strict';
   $.each(activities, function(i, entry) {
     if(entry.mapped_location) {
-      window.addMarker(entry, entry.mapped_location.latitude, entry.mapped_location.longitude, entry[name], icon);
+      addMarker(entry, entry.mapped_location.latitude, entry.mapped_location.longitude, entry[name], icon, 'temp');
     }
   });
 }

@@ -14,12 +14,18 @@ block content
       option(value='historical-sites') Historical Sites
   select(name='radius')
     option(value='.5', selected='selected') 1/2 mile
-      option(value='1') 1 mile
-      option(value='2') 2 miles
-      option(value='5') 5 miles
-      option(value='10') 10 miles
+    option(value='1') 1 mile
+    option(value='2') 2 miles
+    option(value='5') 5 miles
+    option(value='90') 90 miles
+  select#mode
+    option(value='DRIVING', selected='selected') Drive
+    option(value='BICYCLING') Bicycle
+    option(value='TRANSIT') Buses
+    option(value='WALKING') Walk
+
   button#submit Submit
-  button#clear-markers Clear Map
+  button#clear-tmp-markers Clear Map
   button#trip Trip
   #waypoints
   #info
