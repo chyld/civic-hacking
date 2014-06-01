@@ -64,8 +64,7 @@ function addMarker(info, lat, lng, name, icon, type){
 
 function geolocate(){
   'use strict';
-  $('#showLeftPush').removeClass('hide');
-  $('#geolocate').addClass('hide');
+  $('#geolocate').html('Loading...').removeClass('btn-primary').addClass('btn-default').off('click');
   var options = {enableHighAccuracy: true, timeout: 60000, maximumAge: 0};
   navigator.geolocation.getCurrentPosition(
     p=>{
@@ -74,6 +73,8 @@ function geolocate(){
       centerMap(p.coords.latitude, p.coords.longitude);
       map.setZoom(14);
       addMarker(null, p.coords.latitude, p.coords.longitude, 'Me', '/img/geolocate.png', 'save');
+      $('#geolocate').addClass('hide');
+      $('#showLeftPush').removeClass('hide');
     },
     e=>console.log(e),
     options);
@@ -213,8 +214,6 @@ function callOpenDataForResults(activity, radius) {
       icon = '/img/marker-icons/park.png';
       break;
     case 'beer':
-      //query string limits to on-site consumption (no convienence stores, etc.)
-      //can change this later if we fully integerate across multiple datasets
       key = '3wb6-xy3j?permit_type=ON-SALE BEER';
       name = 'business_name';
       icon = '/img/marker-icons/bar.png';
@@ -239,9 +238,6 @@ function callOpenDataForResults(activity, radius) {
       name = 'title';
       icon = '/img/marker-icons/history.png';
   }
-
-  // .json? was breaking any request with a query string
-  // var url = 'http://data.nashville.gov/resource/' + key + '.json?';
 
   var url = 'http://data.nashville.gov/resource/' + key;
   $.getJSON(url, function(data) {
