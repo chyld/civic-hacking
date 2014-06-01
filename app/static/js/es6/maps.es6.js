@@ -7,7 +7,7 @@
   $(document).ready(init);
 
   function init(){
-    initMap(36, -86, 8);
+    initMap(36.1, -86.75, 11);
     $('#geolocate').click(geolocate);
     $('#map').css({
       'height': winHeight,
@@ -124,6 +124,7 @@ function removeWayPoint(){
   waypoints.splice(i, 1);
   savMarkers[i+1].setMap(null);
   savMarkers.splice(i+1, 1);
+  clearDirections();
 }
 
 function trip(){
@@ -149,6 +150,11 @@ function trip(){
       directionsDisplay.setDirections(response);
     }
   });
+}
+
+function clearDirections(){
+  'use strict';
+  directionsDisplay.set('directions', null);
 }
 
 function clearTmpMarkers() {
