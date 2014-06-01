@@ -64,6 +64,8 @@ function addMarker(info, lat, lng, name, icon, type){
 
 function geolocate(){
   'use strict';
+  $('#showLeftPush').removeClass('hide');
+  $('#geolocate').addClass('hide');
   var options = {enableHighAccuracy: true, timeout: 60000, maximumAge: 0};
   navigator.geolocation.getCurrentPosition(
     p=>{
