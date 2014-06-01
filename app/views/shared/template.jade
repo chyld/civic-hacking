@@ -17,6 +17,7 @@ html
       label Activity Type:
       select.form-control(name='activities')
         option(value='parks', selected='selected') Parks
+        option(value='restaurants') Food
         option(value='beer') Beer
         option(value='bus-stops') Bus Stops
         option(value='art') Art
@@ -35,20 +36,20 @@ html
         option(value='BICYCLING') Bicycle
         option(value='TRANSIT') Buses
         option(value='WALKING') Walk
-      button.btn.btn-default#submit Submit
-      button.btn.btn-default#clear-tmp-markers Clear Map
-      button.btn.btn-default#trip Trip
-      #directions
-      #info
-
-
+      button.fancy.btn-1.btn-1d#submit Find Activities
+      button.fancy.btn-1.btn-1d#clear-tmp-markers Clear Map
+      button.fancy.btn-1.btn-1d#trip Plan It!
+      .contain
+        #directions
+      .contain
+        #info
     .container
       header.page-header
-        .center-block#logo
+        img.img-responsive.logoshadow#logo(src='/img/itnerary.svg')
 
     section
       button.btn.btn-primary.btn-lg#geolocate Find Me!
-      button.btn.btn-primary.btn-lg#showLeftPush Start Planning
+      button.btn.btn-primary.btn-lg#showLeftPush.hide Start Planning
     block content
 
     script(src='/js/vendor/jquery-2.1.1.min.js')
@@ -58,7 +59,7 @@ html
     script(src='/js/vendor/classie.js')
     script(src='/js/vendor/buttons.min.js')
     script(src='/js/vendor/traceur.min.js')
-    script(src='https://maps.googleapis.com/maps/api/js?key=AIzaSyD4sNttD_i7PtUfNbANpfyCNt2FRMWzkHY&sensor=true')
+    script(src='https://maps.googleapis.com/maps/api/js?key=AIzaSyD4sNttD_i7PtUfNbANpfyCNt2FRMWzkHY&sensor=true&libraries=weather')
     script(src='/js/es6/compiled/main.js')
     script(src='/js/es6/compiled/maps.js')
     script(src='/js/es6/compiled/beer.js')
@@ -67,7 +68,6 @@ html
     script(src='/js/es6/compiled/art.js')
     script(src='/js/es6/compiled/wifi.js')
     script(src='/js/es6/compiled/history.js')
-    script(src='/js/es6/compiled/food.js')
     script.
       var menuLeft = document.getElementById( 'cbp-spmenu-s1' ),
         showLeftPush = document.getElementById( 'showLeftPush' ),

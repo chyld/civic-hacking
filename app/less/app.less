@@ -5,13 +5,26 @@ html, body, #map{
   width: 100% !important;
 }
 
+#map{
+  border: 10px solid #A1CFEB;
+}
+
 #logo{
-  width: 55%;
-  height: 110px;
-  background-image: url('/img/itnerary.svg');
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: contain;
+  max-width: 100% !important;
+}
+
+.logoshadow {
+  -webkit-filter: drop-shadow( 5px 5px 5px #333 );
+  filter: drop-shadow( 5px 5px 5px #000 );
+}
+
+body, section{
+  background-color: #A1CFEB;
+}
+
+.container {
+  background: #A1CFEB;
+  width: 100%;
 }
 
 header.page-header{
@@ -19,30 +32,111 @@ header.page-header{
   padding-bottom:5px;
 }
 
-#info, #directions{
-  background-color: rgba(255, 255, 255, 0.49);
+.contain{
+  background: rgba(255, 255, 255, 0.49);
   border-radius: 7px;
+  margin: 10px;
+}
+
+#info, #directions{
+  margin: 7px;
   font-family: 'Lato', Calibri, Arial, sans-serif;
   color: #0d77b6;
   font-size: 16px;
-  margin: auto 10px;
-  padding: 7px;
+  overflow-x: auto;
 }
 
-#directions{
-  overflow: scroll;
+img{
+  max-width: none !important;
+}
+
+nav{
+  overflow: auto;
 }
 
 #map{
   padding: 0;
 }
 
-.btn{
+.hide {
+  display: none;
+}
+
+.fancy, .btn{
   margin: 15px 5px;
+}
+
+.fancy {
+	border: none;
+	font-family: inherit;
+	font-size: inherit;
+	color: inherit;
+	background: none;
+	cursor: pointer;
+	padding: 10px;
+	display: inline-block;
+	margin: 10px;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	font-weight: 700;
+	outline: none;
+	position: relative;
+	-webkit-transition: all 0.3s;
+	-moz-transition: all 0.3s;
+	transition: all 0.3s;
+}
+
+.fancy:after {
+	content: '';
+	position: absolute;
+	z-index: -1;
+	-webkit-transition: all 0.3s;
+	-moz-transition: all 0.3s;
+	transition: all 0.3s;
+}
+
+
+.btn-1 {
+	border: 3px solid #fff;
+	color: #fff;
+  border-radius: 7px;
+}
+
+.btn-1d {
+	overflow: hidden;
+}
+
+.btn-1d:after {
+	width: 0;
+	height: 103%;
+	top: 50%;
+	left: 50%;
+	background: #fff;
+	opacity: 0;
+	-webkit-transform: translateX(-50%) translateY(-50%);
+	-moz-transform: translateX(-50%) translateY(-50%);
+	-ms-transform: translateX(-50%) translateY(-50%);
+	transform: translateX(-50%) translateY(-50%);
+}
+
+.btn-1d:hover,
+.btn-1d:active {
+	color: #0e83cd;
+}
+
+.btn-1d:hover:after {
+	width: 90%;
+	opacity: 1;
+}
+
+.btn-1d:active:after {
+	width: 101%;
+	opacity: 1;
 }
 
 select.form-control{
   width: 95%;
+  margin-left: 2%;
 }
 
 label{
@@ -55,4 +149,8 @@ label{
 
 section{
   text-align: center;
+}
+
+#submit, #clear-tmp-markers, #trip{
+  width: 75%;
 }
