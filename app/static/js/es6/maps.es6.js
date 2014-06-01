@@ -187,7 +187,7 @@ function addWayPoint(pos){
   'use strict';
   var latLng = new google.maps.LatLng(pos.lat, pos.lng);
   waypoints.push({location:latLng, stopover:true});
-  $('#waypoints').append(`<p class=waypoint>${pos.title}</p>`);
+  $('#waypoints').append(`<p class=waypoint>${pos.title}<i class="fa fa-trash-o"></i></p>`);
   makeSortable();
 }
 
