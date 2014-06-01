@@ -1,4 +1,4 @@
-/* global google, _ */
+/* global google, _ , addMarker */
 /* jshint unused:false, latedef:false, camelcase:false */
 
 (function(){
@@ -7,17 +7,26 @@
   $(document).ready(init);
 
   function init(){
-    initMap(36.1, -86.7, 11);
+    initMap(36.1, -86.75, 11);
     $('#geolocate').click(geolocate);
+    $('#map').css({
+      'height': winHeight,
+    });
+    $(window).resize(function(){
+      $('#map').css({
+        'height': winHeight,
+      });
+    });
     $('#submit').click(getActivities);
-    $('#clear-markers').click(clearMarkers);
+    $('#clear-tmp-markers').click(clearTmpMarkers);
     $('#trip').click(trip);
     $('#waypoints').on('click', '.waypoint', removeWayPoint);
+    $('#waypoints').on('mousedown', '.waypoint', getSortedPoint);
     makeSortable();
   }
 
   function initMap(lat, lng, zoom){
-    var styles = [{'featureType':'water','elementType':'geometry','stylers':[{'color':'#ffdfa6'}]},{'featureType':'landscape','elementType':'geometry','stylers':[{'color':'#b52127'}]},{'featureType':'poi','elementType':'geometry','stylers':[{'color':'#c5531b'}]},{'featureType':'road.highway','elementType':'geometry.fill','stylers':[{'color':'#74001b'},{'lightness':-10}]},{'featureType':'road.highway','elementType':'geometry.stroke','stylers':[{'color':'#da3c3c'}]},{'featureType':'road.arterial','elementType':'geometry.fill','stylers':[{'color':'#74001b'}]},{'featureType':'road.arterial','elementType':'geometry.stroke','stylers':[{'color':'#da3c3c'}]},{'featureType':'road.local','elementType':'geometry.fill','stylers':[{'color':'#990c19'}]},{'elementType':'labels.text.fill','stylers':[{'color':'#ffffff'}]},{'elementType':'labels.text.stroke','stylers':[{'color':'#74001b'},{'lightness':-8}]},{'featureType':'transit','elementType':'geometry','stylers':[{'color':'#6a0d10'},{'visibility':'on'}]},{'featureType':'administrative','elementType':'geometry','stylers':[{'color':'#ffdfa6'},{'weight':0.4}]},{'featureType':'road.local','elementType':'geometry.stroke','stylers':[{'visibility':'off'}]}];
+    var styles = [{'featureType':'water','elementType':'geometry','stylers':[{'color':'#a2daf2'}]}];
     var mapOptions = {center: new google.maps.LatLng(lat, lng), zoom: zoom, mapTypeId: google.maps.MapTypeId.ROADMAP, styles: styles};
     map = new google.maps.Map(document.getElementById('map'), mapOptions);
     directionsService = new google.maps.DirectionsService();
@@ -29,10 +38,13 @@
 
 /* GLOBAL MAP VARIABLES */
 
+var winHeight = $(window).height();
 var map;
 var loc = {};
-var markers = [];
+var tmpMarkers = [];
+var savMarkers = [];
 var waypoints = [];
+var selectedPoint;
 
 var directionsDisplay;
 var directionsService;
@@ -41,19 +53,65 @@ var directionsService;
 
 function makeSortable(){
   'use strict';
-  $('#waypoints').sortable();
+  $('#waypoints').sortable({update: function(event, ui){
+    console.log(this);
+    rearrangePoints();
+  } });
 }
 
-function addMarker(info, lat, lng, name, icon){
+//on change
+function rearrangePoints(){
+  'use strict';
+  var newIndex = $(selectedPoint).index();
+  var text = $(selectedPoint).text();
+  var savMarker = _.find(savMarkers, { 'title': text });
+  var spliceIndex = _.indexOf(savMarkers, savMarker);
+  //var tempWaypoint = waypoints[spliceIndex - 1];
+
+  savMarkers.splice(spliceIndex, 1);
+  savMarkers.splice(newIndex + 1, savMarker);
+
+  //waypoints.splice(spliceIndex - 1, 1);
+  //waypoints.splice(newIndex, 
+
+
+
+  console.log('newindex:', newIndex);
+  console.log('text:', text);
+  console.log('savMarker:', savMarker);
+  console.log('spliceIndex:', spliceIndex);
+
+
+  //var savMarker = savMarkers[newindex
+}
+
+//gets selected point on mousedown
+function getSortedPoint(){
+  'use strict';
+  selectedPoint = this;
+}
+
+function addMarker(info, lat, lng, name, icon, type){
   'use strict';
   var latLng = new google.maps.LatLng(lat, lng);
   var marker = new google.maps.Marker({map: map, position: latLng, title: name, animation: google.maps.Animation.DROP, icon:icon, info:info});
-  markers.push(marker);
+
+  if(type === 'save'){
+    savMarkers.push(marker);
+  }else{
+    tmpMarkers.push(marker);
+  }
+
+  console.log('savMarkers:', savMarkers);
+  console.log('tmpMarkers:', tmpMarkers);
+
   google.maps.event.addListener(marker, 'click', clickMarker);
 }
 
 function geolocate(){
   'use strict';
+  $('#showLeftPush').removeClass('hide');
+  $('#geolocate').addClass('hide');
   var options = {enableHighAccuracy: true, timeout: 60000, maximumAge: 0};
   navigator.geolocation.getCurrentPosition(
     p=>{
@@ -61,7 +119,7 @@ function geolocate(){
       loc.lng = p.coords.longitude;
       centerMap(p.coords.latitude, p.coords.longitude);
       map.setZoom(14);
-      addMarker(null, p.coords.latitude, p.coords.longitude, 'Me', '/img/geolocate.png');
+      addMarker(null, p.coords.latitude, p.coords.longitude, 'Me', '/img/geolocate.png', 'save');
     },
     e=>console.log(e),
     options);
@@ -80,7 +138,11 @@ function clickMarker(){
   pos.lat = this.position.lat();
   pos.lng = this.position.lng();
   addWayPoint(pos);
+  _(tmpMarkers).pull(this);
+  savMarkers.push(this);
   markerInfo(this.info);
+  console.log('savMarkers:', savMarkers);
+  console.log('tmpMarkers:', tmpMarkers);
 }
 
 function markerInfo(info){
@@ -103,6 +165,7 @@ function addWayPoint(pos){
   var latLng = new google.maps.LatLng(pos.lat, pos.lng);
   waypoints.push({location:latLng, stopover:true});
   $('#waypoints').append(`<p class=waypoint>${pos.title}</p>`);
+  console.log('waypoints:', waypoints);
   makeSortable();
 }
 
@@ -111,6 +174,11 @@ function removeWayPoint(){
   var i = $('.waypoint').index(this);
   this.remove();
   waypoints.splice(i, 1);
+  savMarkers[i+1].setMap(null);
+  savMarkers.splice(i+1, 1);
+  console.log('savMarkers:', savMarkers);
+  console.log('tmpMarkers:', tmpMarkers);
+  trip();
 }
 
 function trip(){
@@ -120,27 +188,14 @@ function trip(){
   var tmppoints = _(waypoints).clone();
   tmppoints.pop();
 
-  var travelMode;
-  switch($('#mode').val()){
-    case 'DRIVING':
-      travelMode = google.maps.TravelMode.DRIVING;
-      break;
-    case 'BICYCLING':
-      travelMode = google.maps.TravelMode.BICYCLING;
-      break;
-    case 'TRANSIT':
-      travelMode = google.maps.TravelMode.TRANSIT;
-      break;
-    case 'WALKING':
-      travelMode = google.maps.TravelMode.WALKING;
-      break;
-  }
+  var mode = $('#mode').val();
+  var travelMode = google.maps.TravelMode[mode];
 
   var request = {
     origin: origin,
     destination: destination,
     waypoints: tmppoints,
-    optimizeWaypoints: true,
+    optimizeWaypoints: false,
     travelMode: travelMode
   };
 
@@ -151,15 +206,23 @@ function trip(){
   });
 }
 
-function clearMarkers() {
+function clearDirections(){
   'use strict';
-  for (var i = 0; i < markers.length; i++ ) {
-    if(markers[i].title !== 'Me') {
-      markers[i].setMap(null);
-    }
+  directionsDisplay.set('directions', null);
+}
+
+function clearTmpMarkers() {
+  'use strict';
+  for (var i = 0; i < tmpMarkers.length; i++ ) {
+    tmpMarkers[i].setMap(null);
   }
+
+  tmpMarkers = [];
   $('#info').empty();
-  markers.length = 1;
+
+  clearDirections();
+  console.log('savMarkers:', savMarkers);
+  console.log('tmpMarkers:', tmpMarkers);
 }
 
 function getDistance(lat1, lon1, lat2, lon2) {
@@ -191,6 +254,9 @@ function getActivities() {
 
 function callOpenDataForResults(activity, radius) {
   'use strict';
+  if(activity === 'restaurants') {
+    return getFoodData(radius);
+  }
   var key;
   var name;
   var icon;
@@ -226,7 +292,6 @@ function callOpenDataForResults(activity, radius) {
       key = 'vk65-u7my';
       name = 'title';
       icon = '/img/marker-icons/history.png';
-
   }
 
   // .json? was breaking any request with a query string
@@ -254,7 +319,6 @@ function findClosestActivities(data, radius, name, icon) {
   } else {
     activities = data;
   }
-  //console.log('activities', activities);
   addActivitiesToMap(activities, name, icon);
 }
 
@@ -262,7 +326,39 @@ function addActivitiesToMap(activities, name, icon) {
   'use strict';
   $.each(activities, function(i, entry) {
     if(entry.mapped_location) {
-      window.addMarker(entry, entry.mapped_location.latitude, entry.mapped_location.longitude, entry[name], icon);
+      addMarker(entry, entry.mapped_location.latitude, entry.mapped_location.longitude, entry[name], icon, 'temp');
     }
   });
 }
+
+function getFoodData(radius){
+    'use strict';
+    var meters = parseFloat(radius, 10) * 1609.34;
+    var url = 'http://api.yelp.com/business_review_search?term=yelp&lat=' + window.loc.lat + '&long=' + window.loc.lng + '&radius_filter=' + meters + '&limit=10&ywsid=EJDoFH3OEMV8iJKwE3pfag&category=restaurants&callback=?';
+    $.getJSON(url, addRestaurantsToMap);
+  }
+
+  function addRestaurantsToMap(data){
+    'use strict';
+    $.each(data.businesses, function(i, business) {
+      formatRestaurant(business);
+    });
+  }
+
+  function formatRestaurant(entry) {
+    'use strict';
+    var geocoder = new google.maps.Geocoder();
+    var address = entry.address1 + ',' + entry.city + ',' + entry.state + ',' + entry.country + ',' + entry.zip;
+    var location = {};
+    location.name = entry.name;
+    geocoder.geocode({ 'address' : address }, function(restaurant, status) {
+      if (status === google.maps.GeocoderStatus.OK) {
+        location.lat = restaurant[0].geometry.location.lat();
+        location.lng = restaurant[0].geometry.location.lng();
+        addMarker(location, location.lat, location.lng, location.name, '/img/marker-icons/treasure.png');
+      }
+      else {
+        alert(status);
+      }
+    });
+  }

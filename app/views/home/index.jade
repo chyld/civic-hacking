@@ -1,35 +1,7 @@
 extends ../shared/template
 
 block content
-  h1 Day Planner
 
-  button#geolocate Find Me!
-  select(name='activities')
-    option(value='parks', selected='selected') Parks
-    option(value='beer') Beer
-    option(value='bus-stops') Bus Stops
-    option(value='art') Art
-    option(value='wifi') Public Wifi
-    option(value='historical-sites') Historical Sites
-  select(name='radius')
-    option(value='.5', selected='selected') 1/2 mile
-    option(value='1') 1 mile
-    option(value='2') 2 miles
-    option(value='5') 5 miles
-    option(value='10') 10 miles
-  select#mode
-    option(value='DRIVING', selected='selected') Drive
-    option(value='BICYCLING') Bicycle
-    option(value='TRANSIT') Buses
-    option(value='WALKING') Walk
-
-  button#submit Submit
-  button#clear-markers Clear Map
-  button#trip Trip
   #waypoints
-    p.waypoint Test1
-    p.waypoint Test2
-    p.waypoint Test3
   #info
   #map
-  #directions
