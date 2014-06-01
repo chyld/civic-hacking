@@ -82,23 +82,15 @@ function rearrangePoints(){
   var text = $(selectedPoint).text();
   var savMarker = _.find(savMarkers, { 'title': text });
   var spliceIndex = _.indexOf(savMarkers, savMarker);
-  //var tempWaypoint = waypoints[spliceIndex - 1];
+  var tempWaypoint = waypoints[spliceIndex - 1];
 
   savMarkers.splice(spliceIndex, 1);
-  savMarkers.splice(newIndex + 1, savMarker);
+  savMarkers.splice(newIndex + 1, 0, savMarker);
 
-  //waypoints.splice(spliceIndex - 1, 1);
-  //waypoints.splice(newIndex, 
+  waypoints.splice(spliceIndex - 1, 1);
+  waypoints.splice(newIndex, 0, tempWaypoint);
 
-
-
-  console.log('newindex:', newIndex);
-  console.log('text:', text);
-  console.log('savMarker:', savMarker);
-  console.log('spliceIndex:', spliceIndex);
-
-
-  //var savMarker = savMarkers[newindex
+  trip();
 }
 
 //gets selected point on mousedown
@@ -118,8 +110,6 @@ function addMarker(info, lat, lng, name, icon, type){
     tmpMarkers.push(marker);
   }
 
-  console.log('savMarkers:', savMarkers);
-  console.log('tmpMarkers:', tmpMarkers);
 
   google.maps.event.addListener(marker, 'click', clickMarker);
 }
@@ -176,8 +166,6 @@ function clickMarker(){
   _(tmpMarkers).pull(this);
   savMarkers.push(this);
   markerInfo(this.info);
-  console.log('savMarkers:', savMarkers);
-  console.log('tmpMarkers:', tmpMarkers);
 }
 
 function markerInfo(info){
@@ -200,7 +188,6 @@ function addWayPoint(pos){
   var latLng = new google.maps.LatLng(pos.lat, pos.lng);
   waypoints.push({location:latLng, stopover:true});
   $('#waypoints').append(`<p class=waypoint>${pos.title}</p>`);
-  console.log('waypoints:', waypoints);
   makeSortable();
 }
 
@@ -211,8 +198,6 @@ function removeWayPoint(){
   waypoints.splice(i, 1);
   savMarkers[i+1].setMap(null);
   savMarkers.splice(i+1, 1);
-  console.log('savMarkers:', savMarkers);
-  console.log('tmpMarkers:', tmpMarkers);
   trip();
 }
 
@@ -256,8 +241,6 @@ function clearTmpMarkers() {
   $('#info').empty();
 
   clearDirections();
-  console.log('savMarkers:', savMarkers);
-  console.log('tmpMarkers:', tmpMarkers);
 }
 
 function getDistance(lat1, lon1, lat2, lon2) {
