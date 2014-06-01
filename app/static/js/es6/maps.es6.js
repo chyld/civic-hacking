@@ -7,7 +7,7 @@
   $(document).ready(init);
 
   function init(){
-    initMap(36, -86, 8);
+    initMap(36.1, -86.75, 11);
     $('#geolocate').click(geolocate);
     $('#map').css({
       'height': winHeight,
@@ -25,12 +25,24 @@
 
   function initMap(lat, lng, zoom){
     var styles = [{'featureType':'water','elementType':'geometry','stylers':[{'color':'#a2daf2'}]}];
-    var mapOptions = {center: new google.maps.LatLng(lat, lng), zoom: zoom, mapTypeId: google.maps.MapTypeId.ROADMAP, styles: styles};
+    var mapOptions = {
+      center: new google.maps.LatLng(lat, lng),
+      zoom: zoom,
+      mapTypeId: google.maps.MapTypeId.ROADMAP,
+      styles: styles
+    };
+
     map = new google.maps.Map(document.getElementById('map'), mapOptions);
     directionsService = new google.maps.DirectionsService();
     directionsDisplay = new google.maps.DirectionsRenderer();
     directionsDisplay.setMap(map);
     directionsDisplay.setPanel(document.getElementById('directions'));
+
+    weatherLayer = new google.maps.weather.WeatherLayer({temperatureUnits: google.maps.weather.TemperatureUnit.FAHRENHEIT});
+    weatherLayer.setMap(map);
+
+    cloudLayer = new google.maps.weather.CloudLayer();
+    cloudLayer.setMap(map);
   }
 })();
 
@@ -45,13 +57,15 @@ var waypoints = [];
 
 var directionsDisplay;
 var directionsService;
+var weatherLayer;
+var cloudLayer;
 
 /* GLOBAL MAP FUNCTIONS */
 
 function addMarker(info, lat, lng, name, icon, type){
   'use strict';
   var latLng = new google.maps.LatLng(lat, lng);
-  var marker = new google.maps.Marker({map: map, position: latLng, title: name, animation: google.maps.Animation.DROP, icon:icon, info:info});
+  var marker = new google.maps.Marker({map: map, position: latLng, title: name, icon:icon, info:info});
 
   if(type === 'save'){
     savMarkers.push(marker);
@@ -64,6 +78,7 @@ function addMarker(info, lat, lng, name, icon, type){
 
 function geolocate(){
   'use strict';
+  $('#geolocate').html('Loading...').removeClass('btn-primary').addClass('btn-default').off('click');
   var options = {enableHighAccuracy: true, timeout: 60000, maximumAge: 0};
   navigator.geolocation.getCurrentPosition(
     p=>{
@@ -72,6 +87,8 @@ function geolocate(){
       centerMap(p.coords.latitude, p.coords.longitude);
       map.setZoom(14);
       addMarker(null, p.coords.latitude, p.coords.longitude, 'Me', '/img/geolocate.png', 'save');
+      $('#geolocate').addClass('hide');
+      $('#showLeftPush').removeClass('hide');
     },
     e=>console.log(e),
     options);
@@ -124,6 +141,7 @@ function removeWayPoint(){
   waypoints.splice(i, 1);
   savMarkers[i+1].setMap(null);
   savMarkers.splice(i+1, 1);
+  trip();
 }
 
 function trip(){
@@ -151,6 +169,11 @@ function trip(){
   });
 }
 
+function clearDirections(){
+  'use strict';
+  directionsDisplay.set('directions', null);
+}
+
 function clearTmpMarkers() {
   'use strict';
   for (var i = 0; i < tmpMarkers.length; i++ ) {
@@ -159,6 +182,8 @@ function clearTmpMarkers() {
 
   tmpMarkers = [];
   $('#info').empty();
+
+  clearDirections();
 }
 
 function getDistance(lat1, lon1, lat2, lon2) {
@@ -203,8 +228,6 @@ function callOpenDataForResults(activity, radius) {
       icon = '/img/marker-icons/park.png';
       break;
     case 'beer':
-      //query string limits to on-site consumption (no convienence stores, etc.)
-      //can change this later if we fully integerate across multiple datasets
       key = '3wb6-xy3j?permit_type=ON-SALE BEER';
       name = 'business_name';
       icon = '/img/marker-icons/bar.png';
@@ -229,9 +252,6 @@ function callOpenDataForResults(activity, radius) {
       name = 'title';
       icon = '/img/marker-icons/history.png';
   }
-
-  // .json? was breaking any request with a query string
-  // var url = 'http://data.nashville.gov/resource/' + key + '.json?';
 
   var url = 'http://data.nashville.gov/resource/' + key;
   $.getJSON(url, function(data) {
@@ -269,8 +289,7 @@ function addActivitiesToMap(activities, name, icon) {
 
 function getFoodData(radius){
     'use strict';
-    var meters = parseFloat(radius, 10) * 1609.34;
-    var url = 'http://api.yelp.com/business_review_search?term=yelp&lat=' + window.loc.lat + '&long=' + window.loc.lng + '&radius_filter=' + meters + '&limit=10&ywsid=EJDoFH3OEMV8iJKwE3pfag&category=restaurants&callback=?';
+    var url = 'http://api.yelp.com/business_review_search?term=yelp&lat=' + window.loc.lat + '&long=' + window.loc.lng + '&radius=' + radius + '&limit=10&ywsid=EJDoFH3OEMV8iJKwE3pfag&category=restaurants&callback=?';
     $.getJSON(url, addRestaurantsToMap);
   }
 
@@ -291,7 +310,7 @@ function getFoodData(radius){
       if (status === google.maps.GeocoderStatus.OK) {
         location.lat = restaurant[0].geometry.location.lat();
         location.lng = restaurant[0].geometry.location.lng();
-        addMarker(location, location.lat, location.lng, location.name, '/img/marker-icons/treasure.png');
+        addMarker(location, location.lat, location.lng, location.name, '/img/marker-icons/food.png');
       }
       else {
         alert(status);

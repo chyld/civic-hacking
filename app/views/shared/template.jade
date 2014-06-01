@@ -17,6 +17,7 @@ html
       label Activity Type:
       select.form-control(name='activities')
         option(value='parks', selected='selected') Parks
+        option(value='restaurants') Food
         option(value='beer') Beer
         option(value='bus-stops') Bus Stops
         option(value='art') Art
@@ -42,15 +43,13 @@ html
         #directions
       .contain
         #info
-
-
     .container
       header.page-header
         img.img-responsive.logoshadow#logo(src='/img/itnerary.svg')
 
     section
       button.btn.btn-primary.btn-lg#geolocate Find Me!
-      button.btn.btn-primary.btn-lg#showLeftPush Start Planning
+      button.btn.btn-primary.btn-lg#showLeftPush.hide Start Planning
     block content
 
     script(src='/js/vendor/jquery-2.1.1.min.js')
@@ -60,7 +59,7 @@ html
     script(src='/js/vendor/classie.js')
     script(src='/js/vendor/buttons.min.js')
     script(src='/js/vendor/traceur.min.js')
-    script(src='https://maps.googleapis.com/maps/api/js?key=AIzaSyD4sNttD_i7PtUfNbANpfyCNt2FRMWzkHY&sensor=true')
+    script(src='https://maps.googleapis.com/maps/api/js?key=AIzaSyD4sNttD_i7PtUfNbANpfyCNt2FRMWzkHY&sensor=true&libraries=weather')
     script(src='/js/es6/compiled/main.js')
     script(src='/js/es6/compiled/maps.js')
     script(src='/js/es6/compiled/beer.js')
