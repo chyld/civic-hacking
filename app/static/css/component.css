@@ -13,6 +13,30 @@
 	background: #0d77b6;
 }
 
+.glyphicon-arrow-left {
+  top: 2px !important;
+  left: 104px !important;
+  font-size: 1em;
+  color: #afdefa;
+  background: #0d77b6;
+}
+
+.glyphicon-arrow-left:hover {
+  cursor: pointer;
+}
+
+.glyphicon.glyphicon-align-justify {
+  position: absolute;
+  top: 20px !important;
+  left: 20px !important;
+  font-size: 1.4em !important;
+  color: #f37a6f;
+}
+
+.glyphicon.glyphicon-align-justify:hover {
+  cursor: pointer;
+}
+
 .cbp-spmenu a {
 	display: block;
 	color: #fff;
