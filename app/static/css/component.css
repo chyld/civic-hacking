@@ -6,11 +6,35 @@
 
 .cbp-spmenu h3 {
 	color: #afdefa;
-	font-size: 1.9em;
+	font-size: 2.9em;
 	padding: 20px;
 	margin: 0;
 	font-weight: 300;
 	background: #0d77b6;
+}
+
+.glyphicon-arrow-left {
+  top: 2px !important;
+  left: 35% !important;
+  font-size: 1em;
+  color: #afdefa;
+  background: #0d77b6;
+}
+
+.glyphicon-arrow-left:hover {
+  cursor: pointer;
+}
+
+.glyphicon.glyphicon-align-justify {
+  position: absolute;
+  top: 20px !important;
+  left: 20px !important;
+  font-size: 1.4em !important;
+  color: whitesmoke;
+}
+
+.glyphicon.glyphicon-align-justify:hover {
+  cursor: pointer;
 }
 
 .cbp-spmenu a {

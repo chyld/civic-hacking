@@ -15,6 +15,7 @@ html
   body.cbp-spmenu-push
     nav.cbp-spmenu.cbp-spmenu-vertical.cbp-spmenu-left#cbp-spmenu-s1
       h3 Menu
+        span.glyphicon.glyphicon-arrow-left
       label Activity Type:
       select.form-control(name='activities')
         option(value='parks', selected='selected') Parks
@@ -37,19 +38,19 @@ html
         option(value='BICYCLING') Bicycle
         option(value='TRANSIT') Buses
         option(value='WALKING') Walk
-      button.btn.btn-default#submit Find
-      button.btn.btn-default#clear-tmp-markers Clear
-      button.btn.btn-default#trip Calculate Trip
-      #directions
-      #info
-
+      button.fancy.btn-1.btn-1d#submit Find Activities
+      button.fancy.btn-1.btn-1d#clear-tmp-markers Clear Map
+      button.fancy.btn-1.btn-1d#trip Plan It!
+      .contain
+        #directions
+      .contain
+        #info
     .container
       header.page-header
-        .center-block#logo
-
+        img.img-responsive.logoshadow#logo(src='/img/itnerary.svg')
+        span.glyphicon.glyphicon-align-justify.hide
     section
-      button.btn.btn-primary.btn-lg#geolocate Find Me!
-      button.btn.btn-primary.btn-lg#showLeftPush.hide Start Planning
+      button.fancy.btn-1.btn-1d#geolocate Find Me!
     block content
 
     script(src='/js/vendor/jquery-2.1.1.min.js')
@@ -61,25 +62,14 @@ html
     script(src='/js/vendor/classie.js')
     script(src='/js/vendor/buttons.min.js')
     script(src='/js/vendor/traceur.min.js')
-    script(src='https://maps.googleapis.com/maps/api/js?key=AIzaSyD4sNttD_i7PtUfNbANpfyCNt2FRMWzkHY&sensor=true')
+    script(src='https://maps.googleapis.com/maps/api/js?key=AIzaSyD4sNttD_i7PtUfNbANpfyCNt2FRMWzkHY&sensor=true&libraries=weather')
     script(src='/js/es6/compiled/main.js')
     script(src='/js/es6/compiled/maps.js')
-    script.
-      var menuLeft = document.getElementById( 'cbp-spmenu-s1' ),
-        showLeftPush = document.getElementById( 'showLeftPush' ),
-        body = document.body;
-
-      showLeftPush.onclick = function() {
-        classie.toggle( this, 'active' );
-        classie.toggle( body, 'cbp-spmenu-push-toright' );
-        classie.toggle( menuLeft, 'cbp-spmenu-open' );
-        disableOther( 'showLeftPush' );
-      };
-
-      function disableOther( button ) {
-        if( button !== 'showLeftPush' ) {
-          classie.toggle( showLeftPush, 'disabled' );
-        }
-      }
+    script(src='/js/es6/compiled/beer.js')
+    script(src='/js/es6/compiled/parks.js')
+    script(src='/js/es6/compiled/busStops.js')
+    script(src='/js/es6/compiled/art.js')
+    script(src='/js/es6/compiled/wifi.js')
+    script(src='/js/es6/compiled/history.js')
 
     block scripts
