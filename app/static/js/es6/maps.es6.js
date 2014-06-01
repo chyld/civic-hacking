@@ -279,8 +279,7 @@ function addActivitiesToMap(activities, name, icon) {
 
 function getFoodData(radius){
     'use strict';
-    var meters = parseFloat(radius, 10) * 1609.34;
-    var url = 'http://api.yelp.com/business_review_search?term=yelp&lat=' + window.loc.lat + '&long=' + window.loc.lng + '&radius_filter=' + meters + '&limit=10&ywsid=EJDoFH3OEMV8iJKwE3pfag&category=restaurants&callback=?';
+    var url = 'http://api.yelp.com/business_review_search?term=yelp&lat=' + window.loc.lat + '&long=' + window.loc.lng + '&radius=' + radius + '&limit=10&ywsid=EJDoFH3OEMV8iJKwE3pfag&category=restaurants&callback=?';
     $.getJSON(url, addRestaurantsToMap);
   }
 
