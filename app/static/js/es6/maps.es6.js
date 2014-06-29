@@ -244,21 +244,6 @@ function clearTmpMarkers() {
   clearDirections();
 }
 
-function getDistance(lat1, lon1, lat2, lon2) {
-  'use strict';
-  var R = 6371; // Radius of the earth in km
-  var dLat = deg2rad(lat2-lat1);
-  var dLon = deg2rad(lon2-lon1);
-  var a =
-    Math.sin(dLat/2) * Math.sin(dLat/2) +
-    Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
-    Math.sin(dLon/2) * Math.sin(dLon/2)
-    ;
-  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-  var d = R * c; // Distance in km
-  return d;
-}
-
 function deg2rad(deg) {
   'use strict';
   return deg * (Math.PI/180);
@@ -279,61 +264,45 @@ function callOpenDataForResults(activity, radius) {
   var key;
   var name;
   var icon;
+  var socrataRadius = radius * 1609.34; // Socrata uses meters.
   switch(activity) {
     case 'parks':
-      key = '74d7-b74t';
+      key = '74d7-b74t?';
       name = 'park_name';
       icon = '/img/marker-icons/park.png';
       break;
     case 'beer':
-      key = '3wb6-xy3j?permit_type=ON-SALE BEER';
+      key = '3wb6-xy3j?permit_type=ON-SALE%20BEER&';
       name = 'business_name';
       icon = '/img/marker-icons/bar.png';
       break;
     case 'bus-stops':
-      key = 'vfe9-k7vc';
+      key = 'vfe9-k7vc?';
       name = 'stopname';
       icon = '/img/marker-icons/bus.png';
       break;
     case 'art':
-      key = 'eviu-nxp6';
+      key = 'eviu-nxp6?';
       name = 'artwork';
       icon = '/img/marker-icons/art.png';
       break;
     case 'wifi':
-      key = '4ugp-s85t';
+      key = '4ugp-s85t?';
       name = 'site_name';
       icon = '/img/marker-icons/wifi.png';
       break;
     case 'historical-sites':
-      key = 'vk65-u7my';
+      key = 'vk65-u7my?';
       name = 'title';
       icon = '/img/marker-icons/history.png';
   }
 
-  var url = 'http://data.nashville.gov/resource/' + key;
-  $.getJSON(url, function(data) {
-    findClosestActivities(data, radius, name, icon);
-  });
-}
+  // takes advantage of Socrata's within_circle function to significantly reduce size of data returned
+  var url = 'http://data.nashville.gov/resource/' + key + '$where=within_circle(mapped_location,' + window.loc.lat + ',' + window.loc.lng + ',' + socrataRadius + ')';
 
-function findClosestActivities(data, radius, name, icon) {
-  'use strict';
-  var activities;
-  if(window.loc.lat) {
-    activities = [];
-    $.each(data, function(i, entry) {
-      if(entry.mapped_location) {
-        var dist = window.getDistance(window.loc.lat, window.loc.lng, entry.mapped_location.latitude, entry.mapped_location.longitude);
-        if(dist <= parseFloat(radius, 10)) {
-          activities.push(entry);
-        }
-      }
-    });
-  } else {
-    activities = data;
-  }
-  addActivitiesToMap(activities, name, icon);
+  $.getJSON(url, function(data) {
+    addActivitiesToMap(data, name, icon);
+  });
 }
 
 function addActivitiesToMap(activities, name, icon) {
