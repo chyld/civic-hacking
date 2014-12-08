@@ -9,7 +9,7 @@
   "bin": {"coveralls" : "./node_modules/coveralls/bin/coveralls.js"},
   "scripts":{
     "start"     : "node app/app.js;",
-    "traceur"   : "git clone https://github.com/google/traceur-compiler tools/traceur-compiler;cd tools/traceur-compiler;npm install;rm ../../app/static/js/vendor/traceur.js;cp bin/traceur.js ../../app/static/js/vendor;",
+    "traceur"   : "git clone https://github.com/google/traceur-compiler tools/traceur-compiler;cd tools/traceur-compiler;npm install;make clean;make;rm ../../app/static/js/vendor/traceur.js;cp bin/traceur.js ../../app/static/js/vendor;",
     "nss"       : "npm install;npm run traceur;",
     "test"      : "mocha --recursive test",
     "coveralls" : "./node_modules/mocha/bin/mocha test --recursive -r blanket -R mocha-lcov-reporter | coveralls"

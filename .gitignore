@@ -3,3 +3,4 @@ node_modules/
 tools/traceur-compiler/
 app/static/js/es6/compiled/*
 !app/static/js/es6/compiled/.gitkeep
+npm-debug.log
