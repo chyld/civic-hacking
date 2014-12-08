@@ -49,7 +49,7 @@ module.exports = function(grunt){
     var cmd;
 
     this.files.forEach(function(f){
-      cmd = './tools/traceur-compiler/traceur --sourcemap --experimental --out '+f.dest+' --script ' + f.src[0];
+      cmd = './tools/traceur-compiler/traceur --source-maps --experimental --out '+f.dest+' --script ' + f.src[0];
       console.log(cmd);
 
       exec(cmd, function(error, stdout, stderr){
